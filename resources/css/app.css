@@ -74,35 +74,14 @@ select:focus[data-flux-control] {
     @apply outline-hidden ring-2 ring-accent ring-offset-2 ring-offset-accent-foreground;
 }
 
-/* Force sidebar grid layout */
-body:has(>[data-flux-sidebar]) {
-    display: grid !important;
-    grid-template: "sidebar header header" "sidebar main aside" 1fr "sidebar footer aside" / min-content minmax(0, 1fr) min-content !important;
+/* Desktop sidebar active nav item */
+.sidebar-nav-item.active {
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+    color: white !important;
+    box-shadow: 0 2px 8px rgba(255, 87, 34, 0.25);
 }
-body:has(>[data-flux-sidebar]+[data-flux-header]) {
-    grid-template-areas: "sidebar header header" "sidebar main aside" "sidebar footer aside" !important;
-}
-
-/* Sidebar nav link: remove Flux default white bg + border outlining on active items */
-[data-flux-sidebar-item][data-current] {
-    --tw-bg-opacity: 0 !important;
-    background-color: transparent !important;
-    border-color: transparent !important;
-    box-shadow: none !important;
-    color: var(--color-primary) !important;
-}
-[data-flux-sidebar-item][data-current] svg {
-    color: var(--color-primary) !important;
-}
-
-/* Sidebar group heading style */
-[data-flux-navlist-group] > div > div:first-child > div {
-    color: var(--color-text);
-    opacity: 0.35;
-    font-weight: 600;
-    font-size: 0.65rem;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
+.sidebar-nav-item.active svg {
+    color: white !important;
 }
 
 /* Sidebar bottom links gradient accents */

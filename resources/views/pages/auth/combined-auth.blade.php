@@ -3,7 +3,7 @@
 @endphp
 
 <x-layouts::auth :title="$initialForm === 'register' ? __('Register') : __('Login')">
-    <div x-data="{ activeTab: '{{ $initialForm }}' }" class="flex flex-col gap-0">
+    <div x-data="{ activeTab: '{{ $initialForm }}', refUsername: new URLSearchParams(window.location.search).get('ref') || '', showRefToast: false, refToastMsg: '' }" x-init="if (refUsername) { refToastMsg = 'Invited by @' + refUsername; showRefToast = true; setTimeout(() => showRefToast = false, 3000); }" class="flex flex-col gap-0">
 
         {{-- Header --}}
         <div class="text-center mb-1">
@@ -126,6 +126,26 @@
             </div>
         @endif
 
+        {{-- Referral Toast --}}
+        <div
+            x-show="showRefToast"
+            x-transition:enter="transition ease-out duration-300"
+            x-transition:enter-start="opacity-0 -translate-y-4"
+            x-transition:enter-end="opacity-100 translate-y-0"
+            x-transition:leave="transition ease-in duration-200"
+            x-transition:leave-start="opacity-100 translate-y-0"
+            x-transition:leave-end="opacity-0 -translate-y-4"
+            class="fixed top-4 left-1/2 -translate-x-1/2 z-[100]"
+        >
+            <div class="flex items-center gap-3 px-5 py-3 rounded-xl shadow-lg border bg-green-50 border-green-200 text-green-700 dark:bg-green-900/30 dark:border-green-800 dark:text-green-400">
+                <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z"/></svg>
+                <span class="text-sm font-medium" x-text="refToastMsg"></span>
+                <button @click="showRefToast = false" class="ml-2 shrink-0 opacity-60 hover:opacity-100 cursor-pointer">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+        </div>
+
         {{-- Register Form --}}
         <div x-show="activeTab === 'register'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100">
             <form method="POST" action="{{ route('register.store') }}" class="flex flex-col gap-4">
@@ -141,6 +161,46 @@
                         autofocus
                         autocomplete="name"
                         placeholder="e.g. Alex Johnson"
+                        class="w-full rounded-xl border border-gray-200 dark:border-neutral-600 bg-white dark:bg-neutral-800 px-4 py-3 text-sm text-text placeholder-text/30 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors"
+                    >
+                </div>
+
+                <div>
+                    <label for="reg-username" class="block text-sm font-medium text-text mb-1.5">{{ __('Username') }}</label>
+                    <input
+                        id="reg-username"
+                        name="username"
+                        type="text"
+                        value="{{ old('username') }}"
+                        required
+                        autocomplete="username"
+                        placeholder="e.g. alexjohnson"
+                        class="w-full rounded-xl border border-gray-200 dark:border-neutral-600 bg-white dark:bg-neutral-800 px-4 py-3 text-sm text-text placeholder-text/30 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors"
+                    >
+                </div>
+
+                <div>
+                    <label for="reg-phone" class="block text-sm font-medium text-text mb-1.5">{{ __('Phone number') }} <span class="text-text/30">({{ __('optional') }})</span></label>
+                    <input
+                        id="reg-phone"
+                        name="phone"
+                        type="tel"
+                        value="{{ old('phone') }}"
+                        autocomplete="tel"
+                        placeholder="e.g. 08012345678"
+                        class="w-full rounded-xl border border-gray-200 dark:border-neutral-600 bg-white dark:bg-neutral-800 px-4 py-3 text-sm text-text placeholder-text/30 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors"
+                    >
+                </div>
+
+                <div>
+                    <label for="reg-ref" class="block text-sm font-medium text-text mb-1.5">{{ __('Referral Username') }} <span class="text-text/30">({{ __('optional') }})</span></label>
+                    <input
+                        id="reg-ref"
+                        name="ref"
+                        type="text"
+                        x-model="refUsername"
+                        autocomplete="off"
+                        placeholder="e.g. puqoh"
                         class="w-full rounded-xl border border-gray-200 dark:border-neutral-600 bg-white dark:bg-neutral-800 px-4 py-3 text-sm text-text placeholder-text/30 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors"
                     >
                 </div>
@@ -168,20 +228,6 @@
                         required
                         autocomplete="new-password"
                         placeholder="At least 8 characters"
-                        passwordrules="{{ \Illuminate\Validation\Rules\Password::defaults()->toPasswordRulesString() }}"
-                        class="w-full rounded-xl border border-gray-200 dark:border-neutral-600 bg-white dark:bg-neutral-800 px-4 py-3 text-sm text-text placeholder-text/30 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors"
-                    >
-                </div>
-
-                <div>
-                    <label for="reg-password-confirmation" class="block text-sm font-medium text-text mb-1.5">{{ __('Confirm password') }}</label>
-                    <input
-                        id="reg-password-confirmation"
-                        name="password_confirmation"
-                        type="password"
-                        required
-                        autocomplete="new-password"
-                        placeholder="Repeat your password"
                         passwordrules="{{ \Illuminate\Validation\Rules\Password::defaults()->toPasswordRulesString() }}"
                         class="w-full rounded-xl border border-gray-200 dark:border-neutral-600 bg-white dark:bg-neutral-800 px-4 py-3 text-sm text-text placeholder-text/30 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors"
                     >

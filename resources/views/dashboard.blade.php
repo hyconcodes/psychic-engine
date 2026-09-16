@@ -4,12 +4,18 @@
         {{-- Mobile Header --}}
         <div class="flex items-center justify-between lg:hidden">
             <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center text-primary text-sm font-bold">
-                    {{ auth()->user()->initials() }}
+                <div class="relative">
+                    <div class="absolute -inset-0.5 bg-gradient-to-br from-primary to-secondary rounded-full blur-sm opacity-60"></div>
+                    <div class="w-11 h-11 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center text-white text-sm font-bold relative ring-2 ring-white dark:ring-neutral-900 shadow-lg shadow-primary/30">
+                        {{ auth()->user()->initials() }}
+                    </div>
+                    <div class="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-green-400 rounded-full border-2 border-white dark:border-neutral-900"></div>
                 </div>
                 <div>
-                    <p class="text-xs text-text/40">Good {{ now()->format('A') < 12 ? 'morning' : (now()->format('A') < 17 ? 'afternoon' : 'evening') }},</p>
-                    <p class="text-sm font-semibold text-text">{{ auth()->user()->name }}</p>
+                    <p class="text-[11px] text-text/40 tracking-wide">Good {{ now()->format('A') < 12 ? 'morning' : (now()->format('A') < 17 ? 'afternoon' : 'evening') }}</p>
+                    <div class="flex items-center gap-1.5 mt-0.5">
+                        <span class="text-base font-extrabold bg-gradient-to-r from-primary via-secondary to-primary bg-clip-text text-transparent leading-tight" style="font-family: 'DM Serif Display', Georgia, serif;">{{ '@' . auth()->user()->username }}</span>
+                    </div>
                 </div>
             </div>
             <button class="w-9 h-9 flex items-center justify-center rounded-full border border-gray-200 dark:border-neutral-700 hover:bg-gray-50 dark:hover:bg-neutral-800 transition-colors">
@@ -19,9 +25,21 @@
 
         {{-- Desktop Header --}}
         <div class="hidden lg:flex items-center justify-between">
-            <div>
-                <h1 class="text-2xl font-semibold text-text" style="font-family: 'DM Serif Display', Georgia, serif;">Dashboard</h1>
-                <p class="text-sm text-text/45 mt-0.5">Welcome back, {{ auth()->user()->name }}</p>
+            <div class="flex items-center gap-4">
+                <div class="relative">
+                    <div class="absolute -inset-1 bg-gradient-to-br from-primary to-secondary rounded-full blur-md opacity-50"></div>
+                    <div class="w-14 h-14 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center text-white text-xl font-bold relative ring-2 ring-white dark:ring-neutral-900 shadow-xl shadow-primary/30" style="font-family: 'DM Serif Display', Georgia, serif;">
+                        {{ auth()->user()->initials() }}
+                    </div>
+                    <div class="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-green-400 rounded-full border-2 border-white dark:border-neutral-900"></div>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold bg-gradient-to-r from-primary via-secondary to-primary bg-clip-text text-transparent" style="font-family: 'DM Serif Display', Georgia, serif;">Dashboard</h1>
+                    <div class="flex items-center gap-1.5 mt-0.5">
+                        <span class="text-lg font-extrabold bg-gradient-to-r from-primary via-secondary to-primary bg-clip-text text-transparent" style="font-family: 'DM Serif Display', Georgia, serif;">{{ '@' . auth()->user()->username }}</span>
+                        <span class="text-xs text-text/30">&middot; Welcome back</span>
+                    </div>
+                </div>
             </div>
             <button class="w-10 h-10 flex items-center justify-center rounded-full border border-gray-200 dark:border-neutral-700 hover:bg-gray-50 dark:hover:bg-neutral-800 transition-colors relative">
                 <svg class="w-5 h-5 text-text/50" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0"/></svg>
@@ -40,29 +58,54 @@
             </button>
         </div>
 
-        {{-- Balance Card --}}
-        <div class="bg-white dark:bg-neutral-900 rounded-2xl border border-gray-100 dark:border-neutral-800 p-6 relative overflow-hidden shadow-sm">
-            <div class="absolute top-0 left-0 w-1.5 h-full bg-gradient-to-b from-primary to-secondary rounded-r-full"></div>
-            <div class="absolute top-0 right-0 w-24 h-24 bg-primary/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-2xl"></div>
-            <div class="flex items-start justify-between mb-6">
-                <div>
-                    <p class="text-xs text-text/40 uppercase tracking-wider mb-1">Total balance</p>
-                    <p class="text-3xl sm:text-4xl font-bold text-text" style="font-family: 'DM Serif Display', Georgia, serif;">&#8358;0.00</p>
-                    <p class="text-xs text-text/35 mt-1">@{{ strtolower(str_replace(' ', '', auth()->user()->name)) }} &middot; Free plan</p>
+        {{-- Balance Card — ATM Style --}}
+        <div class="bg-gradient-to-br from-primary via-primary to-secondary rounded-2xl p-6 relative overflow-hidden shadow-2xl shadow-primary/25 ring-1 ring-white/10">
+            {{-- Background decorations --}}
+            <div class="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/4 blur-xl"></div>
+            <div class="absolute bottom-0 left-0 w-32 h-32 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/4 blur-xl"></div>
+            {{-- Transparent SVG decorations --}}
+            <svg class="absolute top-3 right-14 w-20 h-20 text-white/[0.06] rotate-12" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+            <svg class="absolute bottom-2 left-6 w-14 h-14 text-white/[0.05] -rotate-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/></svg>
+            <svg class="absolute top-8 left-2 w-10 h-10 text-white/[0.04] rotate-45" fill="currentColor" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+            <div class="absolute top-4 right-4 w-2 h-2 bg-white/30 rounded-full"></div>
+            <div class="absolute top-8 right-10 w-1.5 h-1.5 bg-white/20 rounded-full"></div>
+            <div class="absolute bottom-6 left-8 w-1.5 h-1.5 bg-white/20 rounded-full"></div>
+
+            <div class="relative">
+                <div class="flex items-start justify-between mb-8">
+                    <div>
+                        <p class="text-xs text-white/60 uppercase tracking-wider mb-1">Total balance</p>
+                        <p class="text-3xl sm:text-4xl font-bold text-white" style="font-family: 'DM Serif Display', Georgia, serif;">&#8358;0.00</p>
+                        <div class="flex items-center gap-2 mt-2">
+                            <div class="relative">
+                                <div class="w-6 h-6 bg-white/25 rounded-full flex items-center justify-center text-[10px] font-bold text-white ring-1 ring-white/20">
+                                    {{ auth()->user()->initials() }}
+                                </div>
+                            </div>
+                            <span class="text-xs font-semibold text-white/80 tracking-wide">{{ '@' . auth()->user()->username }}</span>
+                            <span class="text-[10px] text-white/40">&middot; Free plan</span>
+                        </div>
+                    </div>
+                    {{-- Bubbling Microphone --}}
+                    <div class="relative">
+                        <div class="absolute inset-0 bg-white/20 rounded-full animate-ping"></div>
+                        <div class="absolute -inset-1 bg-white/10 rounded-full animate-pulse"></div>
+                        <div class="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center relative">
+                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 18.75a6 6 0 006-6v-1.5m-6 7.5a6 6 0 01-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 01-3-3V4.5a3 3 0 116 0v8.25a3 3 0 01-3 3z"/></svg>
+                        </div>
+                    </div>
                 </div>
-                <div class="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
-                    <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 18.75a6 6 0 006-6v-1.5m-6 7.5a6 6 0 01-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 01-3-3V4.5a3 3 0 116 0v8.25a3 3 0 01-3 3z"/></svg>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <button class="flex items-center justify-center gap-2 py-3 rounded-xl bg-white/10 hover:bg-white/20 backdrop-blur-md text-sm font-semibold text-white transition-all cursor-pointer border border-white/20 shadow-[inset_0_1px_1px_rgba(255,255,255,0.2),0_4px_12px_rgba(0,0,0,0.1)]">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg>
+                        Withdraw
+                    </button>
+                    <button class="flex items-center justify-center gap-2 py-3 rounded-xl bg-white hover:bg-white/90 text-sm font-semibold text-primary transition-all cursor-pointer shadow-lg shadow-black/10">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z"/></svg>
+                        Upgrade
+                    </button>
                 </div>
-            </div>
-            <div class="grid grid-cols-2 gap-3">
-                <button class="flex items-center justify-center gap-2 py-3 rounded-xl border border-gray-200 dark:border-neutral-700 text-sm font-medium text-text hover:bg-gray-50 dark:hover:bg-neutral-800 transition-colors cursor-pointer">
-                    <svg class="w-4 h-4 text-primary" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg>
-                    Withdraw
-                </button>
-                <button class="flex items-center justify-center gap-2 py-3 rounded-xl bg-primary hover:bg-primary/90 text-sm font-semibold text-white transition-colors cursor-pointer">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z"/></svg>
-                    Upgrade
-                </button>
             </div>
         </div>
 
@@ -152,7 +195,7 @@
 
             <div class="flex items-center gap-2 mb-4">
                 <div class="flex-1 bg-gray-50 dark:bg-neutral-800 rounded-lg px-3 py-2.5 text-xs text-text/50 font-mono truncate">
-                    vocalpay.ng/ref/{{ strtolower(str_replace(' ', '', auth()->user()->name)) }}
+                    {{ route('register') }}?ref={{ auth()->user()->username }}
                 </div>
                 <button class="px-4 py-2.5 bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 text-white text-xs font-semibold rounded-lg transition-all shrink-0 cursor-pointer shadow-sm hover:shadow-md">
                     Copy

@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 520" width="500" height="520">
+  <defs>
+    <linearGradient id="map-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF5722" stop-opacity="0.08"/>
+      <stop offset="100%" stop-color="#FFA726" stop-opacity="0.04"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <!-- Simplified Africa continent outline -->
+  <path d="M250,30 C270,28 290,35 305,45 C320,55 335,60 350,70 C365,80 375,95 380,110 C385,125 390,145 395,165 C400,185 402,205 400,225 C398,245 392,265 385,280 C378,295 368,310 355,325 C342,340 325,350 310,360 C295,370 280,380 265,395 C250,410 240,425 235,440 C230,455 228,470 225,480 C222,490 218,495 210,498 C202,500 190,498 180,492 C170,486 162,475 155,460 C148,445 142,425 138,405 C134,385 130,365 125,348 C120,331 112,318 102,308 C92,298 80,292 68,288 C56,284 45,282 38,275 C31,268 28,258 30,248 C32,238 38,228 45,218 C52,208 58,195 60,180 C62,165 60,148 62,132 C64,116 70,102 80,90 C90,78 105,70 120,62 C135,54 152,48 170,42 C188,36 208,32 228,30 C238,29 245,29 250,30 Z" fill="url(#map-gradient)" stroke="#FF5722" stroke-width="1.5" stroke-opacity="0.2"/>
+  <!-- City dots with labels -->
+  <!-- Lagos -->
+  <circle cx="148" cy="240" r="6" fill="#FF5722" filter="url(#glow)" opacity="0.9"/>
+  <circle cx="148" cy="240" r="3" fill="#ffffff"/>
+  <text x="148" y="260" font-family="system-ui, sans-serif" font-size="11" font-weight="600" fill="#1E293B" text-anchor="middle">Lagos</text>
+  <!-- Accra -->
+  <circle cx="135" cy="232" r="5" fill="#FF5722" filter="url(#glow)" opacity="0.8"/>
+  <circle cx="135" cy="232" r="2.5" fill="#ffffff"/>
+  <text x="120" y="222" font-family="system-ui, sans-serif" font-size="10" font-weight="500" fill="#64748b" text-anchor="middle">Accra</text>
+  <!-- Nairobi -->
+  <circle cx="310" cy="290" r="6" fill="#FF5722" filter="url(#glow)" opacity="0.9"/>
+  <circle cx="310" cy="290" r="3" fill="#ffffff"/>
+  <text x="310" y="310" font-family="system-ui, sans-serif" font-size="11" font-weight="600" fill="#1E293B" text-anchor="middle">Nairobi</text>
+  <!-- Addis Ababa -->
+  <circle cx="295" cy="248" r="5" fill="#FF5722" filter="url(#glow)" opacity="0.8"/>
+  <circle cx="295" cy="248" r="2.5" fill="#ffffff"/>
+  <text x="295" y="238" font-family="system-ui, sans-serif" font-size="10" font-weight="500" fill="#64748b" text-anchor="middle">Addis Ababa</text>
+  <!-- Cairo -->
+  <circle cx="260" cy="110" r="5" fill="#FF5722" filter="url(#glow)" opacity="0.7"/>
+  <circle cx="260" cy="110" r="2.5" fill="#ffffff"/>
+  <text x="260" y="100" font-family="system-ui, sans-serif" font-size="10" font-weight="500" fill="#64748b" text-anchor="middle">Cairo</text>
+  <!-- Johannesburg -->
+  <circle cx="260" cy="400" r="5" fill="#FF5722" filter="url(#glow)" opacity="0.7"/>
+  <circle cx="260" cy="400" r="2.5" fill="#ffffff"/>
+  <text x="260" y="420" font-family="system-ui, sans-serif" font-size="10" font-weight="500" fill="#64748b" text-anchor="middle">Johannesburg</text>
+  <!-- Dar es Salaam -->
+  <circle cx="318" cy="310" r="4" fill="#FF5722" filter="url(#glow)" opacity="0.6"/>
+  <circle cx="318" cy="310" r="2" fill="#ffffff"/>
+  <!-- Kampala -->
+  <circle cx="300" cy="278" r="4" fill="#FF5722" filter="url(#glow)" opacity="0.6"/>
+  <circle cx="300" cy="278" r="2" fill="#ffffff"/>
+  <!-- Abidjan -->
+  <circle cx="120" cy="245" r="4" fill="#FF5722" filter="url(#glow)" opacity="0.6"/>
+  <circle cx="120" cy="245" r="2" fill="#ffffff"/>
+  <!-- Connection lines (subtle) -->
+  <line x1="148" y1="240" x2="310" y2="290" stroke="#FF5722" stroke-width="0.5" stroke-opacity="0.15" stroke-dasharray="4,4"/>
+  <line x1="148" y1="240" x2="295" y2="248" stroke="#FF5722" stroke-width="0.5" stroke-opacity="0.15" stroke-dasharray="4,4"/>
+  <line x1="310" y1="290" x2="295" y2="248" stroke="#FF5722" stroke-width="0.5" stroke-opacity="0.15" stroke-dasharray="4,4"/>
+</svg>

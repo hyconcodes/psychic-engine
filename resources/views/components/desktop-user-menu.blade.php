@@ -22,6 +22,19 @@
             <flux:menu.item :href="route('profile.edit')" icon="cog" wire:navigate>
                 {{ __('Settings') }}
             </flux:menu.item>
+        </flux:menu.radio.group>
+        <flux:menu.radio.group>
+            <flux:menu.item
+                x-data
+                x-on:click="$flux.appearance = ($flux.appearance === 'dark' || ($flux.appearance === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)) ? 'light' : 'dark'"
+                x-bind:icon="($flux.appearance === 'light' || ($flux.appearance === 'system' && !window.matchMedia('(prefers-color-scheme: dark)').matches)) ? 'moon' : 'sun'"
+                class="cursor-pointer"
+            >
+                <span x-text="($flux.appearance === 'light' || ($flux.appearance === 'system' && !window.matchMedia('(prefers-color-scheme: dark)').matches)) ? '{{ __('Switch to Dark') }}' : '{{ __('Switch to Light') }}'"></span>
+            </flux:menu.item>
+        </flux:menu.radio.group>
+        <flux:menu.separator />
+        <flux:menu.radio.group>
             <form method="POST" action="{{ route('logout') }}" class="w-full">
                 @csrf
                 <flux:menu.item

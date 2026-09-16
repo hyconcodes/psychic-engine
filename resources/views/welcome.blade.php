@@ -563,14 +563,14 @@
                         <ul class="space-y-2 text-sm text-text/45">
                             <li><a href="#how" class="hover:text-text transition-colors">How It Works</a></li>
                             <li><a href="#faq" class="hover:text-text transition-colors">FAQ</a></li>
-                            <li><a href="#" class="hover:text-text transition-colors">Contact</a></li>
+                            <li><a href="{{ route('contact') }}" class="hover:text-text transition-colors">Contact</a></li>
                         </ul>
                     </div>
                     <div>
                         <h4 class="text-xs font-semibold text-text uppercase tracking-wider mb-3">Legal</h4>
                         <ul class="space-y-2 text-sm text-text/45">
-                            <li><a href="#" class="hover:text-text transition-colors">Terms</a></li>
-                            <li><a href="#" class="hover:text-text transition-colors">Privacy</a></li>
+                            <li><a href="{{ route('terms') }}" class="hover:text-text transition-colors">Terms</a></li>
+                            <li><a href="{{ route('privacy') }}" class="hover:text-text transition-colors">Privacy</a></li>
                         </ul>
                     </div>
                 </div>

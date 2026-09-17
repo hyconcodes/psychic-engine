@@ -167,7 +167,7 @@
         <div>
             <div class="flex items-center justify-between mb-3">
                 <h2 class="text-sm font-semibold text-text">Overview</h2>
-                <a href="#" class="text-xs font-medium text-primary hover:text-primary/80">All transactions</a>
+                <a href="{{ route('transactions.index') }}" class="text-xs font-medium text-primary hover:text-primary/80">All transactions</a>
             </div>
             <div class="grid grid-cols-2 gap-3">
                 <div class="bg-white dark:bg-neutral-900 rounded-xl border border-gray-100 dark:border-neutral-800 p-4 shadow-sm hover:shadow-md transition-shadow">

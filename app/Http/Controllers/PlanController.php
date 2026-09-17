@@ -33,9 +33,13 @@ class PlanController extends Controller
         $user = Auth::user();
 
         if ($user->hasActivePlan()) {
-            return redirect()->route('plans.index')
-                ->with('toast_message', 'You already have an active plan.')
-                ->with('toast_variant', 'warning');
+            $currentPlan = $user->currentPlan();
+
+            if ($plan->sort_order <= $currentPlan->sort_order) {
+                return redirect()->route('plans.index')
+                    ->with('toast_message', 'You cannot downgrade to this plan.')
+                    ->with('toast_variant', 'warning');
+            }
         }
 
         if (! $plan->bachs_product_id) {

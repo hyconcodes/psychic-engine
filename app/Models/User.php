@@ -2,12 +2,13 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Carbon;
@@ -39,11 +40,6 @@ class User extends Authenticatable implements PasskeyUser
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable, PasskeyAuthenticatable, TwoFactorAuthenticatable;
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
     protected function casts(): array
     {
         return [
@@ -52,9 +48,6 @@ class User extends Authenticatable implements PasskeyUser
         ];
     }
 
-    /**
-     * Get the user's initials
-     */
     public function initials(): string
     {
         $initials = Str::initials($this->name, true);
@@ -64,11 +57,45 @@ class User extends Authenticatable implements PasskeyUser
             : $initials;
     }
 
-    /**
-     * Get the user who referred this user.
-     */
     public function referrer(): BelongsTo
     {
         return $this->belongsTo(self::class, 'referred_by');
+    }
+
+    public function activeSubscription(): HasOne
+    {
+        return $this->hasOne(UserSubscription::class)->where('status', 'active')->latest('activated_at');
+    }
+
+    public function subscriptions(): HasMany
+    {
+        return $this->hasMany(UserSubscription::class);
+    }
+
+    public function wallet(): HasOne
+    {
+        return $this->hasOne(Wallet::class);
+    }
+
+    public function transactions(): HasMany
+    {
+        return $this->hasMany(Transaction::class);
+    }
+
+    public function hasActivePlan(): bool
+    {
+        return $this->activeSubscription()->exists();
+    }
+
+    public function currentPlan(): ?Plan
+    {
+        $subscription = $this->activeSubscription()->with('plan')->first();
+
+        return $subscription?->plan;
+    }
+
+    public function isAdmin(): bool
+    {
+        return $this->email === 'admin@vocalpay.co';
     }
 }

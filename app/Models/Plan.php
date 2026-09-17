@@ -1,0 +1,48 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+
+class Plan extends Model
+{
+    protected $fillable = [
+        'name',
+        'slug',
+        'price',
+        'voice_earn_per_session',
+        'word_game_per_word',
+        'features',
+        'is_popular',
+        'is_active',
+        'sort_order',
+    ];
+
+    protected $casts = [
+        'price' => 'decimal:2',
+        'features' => 'array',
+        'is_popular' => 'boolean',
+        'is_active' => 'boolean',
+    ];
+
+    public function subscriptions(): HasMany
+    {
+        return $this->hasMany(UserSubscription::class);
+    }
+
+    public function scopeActive($query)
+    {
+        return $query->where('is_active', true);
+    }
+
+    public function scopeOrdered($query)
+    {
+        return $query->orderBy('sort_order')->orderBy('price');
+    }
+
+    public function formattedPrice(): string
+    {
+        return '₦'.number_format((float) $this->price);
+    }
+}

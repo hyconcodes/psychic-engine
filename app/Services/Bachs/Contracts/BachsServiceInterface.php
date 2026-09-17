@@ -1,0 +1,16 @@
+<?php
+
+namespace App\Services\Bachs\Contracts;
+
+use App\Services\Bachs\DTOs\CheckoutSessionRequest;
+use App\Services\Bachs\DTOs\CheckoutSessionResponse;
+use App\Services\Bachs\DTOs\CheckoutSessionVerification;
+
+interface BachsServiceInterface
+{
+    public function createCheckoutSession(CheckoutSessionRequest $request): CheckoutSessionResponse;
+
+    public function verifyCheckoutSession(string $checkoutId): CheckoutSessionVerification;
+
+    public function getPaymentMethods(): array;
+}

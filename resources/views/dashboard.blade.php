@@ -1,4 +1,10 @@
 <x-layouts::app :title="__('Dashboard')">
+    @php
+        $user = auth()->user();
+        $currentPlan = $user->currentPlan();
+        $wallet = $user->wallet;
+        $balance = $wallet ? $wallet->formattedBalance() : '₦0.00';
+    @endphp
     <div x-data="{ showBanner: true }" class="space-y-6">
 
         {{-- Mobile Header --}}
@@ -7,14 +13,14 @@
                 <div class="relative">
                     <div class="absolute -inset-0.5 bg-gradient-to-br from-primary to-secondary rounded-full blur-sm opacity-60"></div>
                     <div class="w-11 h-11 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center text-white text-sm font-bold relative ring-2 ring-white dark:ring-neutral-900 shadow-lg shadow-primary/30">
-                        {{ auth()->user()->initials() }}
+                        {{ $user->initials() }}
                     </div>
                     <div class="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-green-400 rounded-full border-2 border-white dark:border-neutral-900"></div>
                 </div>
                 <div>
                     <p class="text-[11px] text-text/40 tracking-wide">Good {{ now()->format('A') < 12 ? 'morning' : (now()->format('A') < 17 ? 'afternoon' : 'evening') }}</p>
                     <div class="flex items-center gap-1.5 mt-0.5">
-                        <span class="text-base font-extrabold bg-gradient-to-r from-primary via-secondary to-primary bg-clip-text text-transparent leading-tight" style="font-family: 'DM Serif Display', Georgia, serif;">{{ '@' . auth()->user()->username }}</span>
+                        <span class="text-base font-extrabold bg-gradient-to-r from-primary via-secondary to-primary bg-clip-text text-transparent leading-tight" style="font-family: 'DM Serif Display', Georgia, serif;">{{ '@' . $user->username }}</span>
                     </div>
                 </div>
             </div>
@@ -29,14 +35,14 @@
                 <div class="relative">
                     <div class="absolute -inset-1 bg-gradient-to-br from-primary to-secondary rounded-full blur-md opacity-50"></div>
                     <div class="w-14 h-14 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center text-white text-xl font-bold relative ring-2 ring-white dark:ring-neutral-900 shadow-xl shadow-primary/30" style="font-family: 'DM Serif Display', Georgia, serif;">
-                        {{ auth()->user()->initials() }}
+                        {{ $user->initials() }}
                     </div>
                     <div class="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-green-400 rounded-full border-2 border-white dark:border-neutral-900"></div>
                 </div>
                 <div>
                     <h1 class="text-xl font-bold bg-gradient-to-r from-primary via-secondary to-primary bg-clip-text text-transparent" style="font-family: 'DM Serif Display', Georgia, serif;">Dashboard</h1>
                     <div class="flex items-center gap-1.5 mt-0.5">
-                        <span class="text-lg font-extrabold bg-gradient-to-r from-primary via-secondary to-primary bg-clip-text text-transparent" style="font-family: 'DM Serif Display', Georgia, serif;">{{ '@' . auth()->user()->username }}</span>
+                        <span class="text-lg font-extrabold bg-gradient-to-r from-primary via-secondary to-primary bg-clip-text text-transparent" style="font-family: 'DM Serif Display', Georgia, serif;">{{ '@' . $user->username }}</span>
                         <span class="text-xs text-text/30">&middot; Welcome back</span>
                     </div>
                 </div>
@@ -75,15 +81,19 @@
                 <div class="flex items-start justify-between mb-8">
                     <div>
                         <p class="text-xs text-white/60 uppercase tracking-wider mb-1">Total balance</p>
-                        <p class="text-3xl sm:text-4xl font-bold text-white" style="font-family: 'DM Serif Display', Georgia, serif;">&#8358;0.00</p>
+                        <p class="text-3xl sm:text-4xl font-bold text-white" style="font-family: 'DM Serif Display', Georgia, serif;">{{ $balance }}</p>
                         <div class="flex items-center gap-2 mt-2">
                             <div class="relative">
                                 <div class="w-6 h-6 bg-white/25 rounded-full flex items-center justify-center text-[10px] font-bold text-white ring-1 ring-white/20">
-                                    {{ auth()->user()->initials() }}
+                                    {{ $user->initials() }}
                                 </div>
                             </div>
-                            <span class="text-xs font-semibold text-white/80 tracking-wide">{{ '@' . auth()->user()->username }}</span>
-                            <span class="text-[10px] text-white/40">&middot; Free plan</span>
+                            <span class="text-xs font-semibold text-white/80 tracking-wide">{{ '@' . $user->username }}</span>
+                            @if($currentPlan)
+                                <span class="text-[10px] text-white/40">&middot; {{ $currentPlan->name }}</span>
+                            @else
+                                <span class="text-[10px] text-white/40">&middot; Free plan</span>
+                            @endif
                         </div>
                     </div>
                     {{-- Bubbling Microphone --}}
@@ -97,14 +107,14 @@
                 </div>
 
                 <div class="grid grid-cols-2 gap-3">
-                    <button class="flex items-center justify-center gap-2 py-3 rounded-xl bg-white/10 hover:bg-white/20 backdrop-blur-md text-sm font-semibold text-white transition-all cursor-pointer border border-white/20 shadow-[inset_0_1px_1px_rgba(255,255,255,0.2),0_4px_12px_rgba(0,0,0,0.1)]">
+                    <a href="{{ route('plans.index') }}" class="flex items-center justify-center gap-2 py-3 rounded-xl bg-white/10 hover:bg-white/20 backdrop-blur-md text-sm font-semibold text-white transition-all cursor-pointer border border-white/20 shadow-[inset_0_1px_1px_rgba(255,255,255,0.2),0_4px_12px_rgba(0,0,0,0.1)]">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg>
                         Withdraw
-                    </button>
-                    <button class="flex items-center justify-center gap-2 py-3 rounded-xl bg-white hover:bg-white/90 text-sm font-semibold text-primary transition-all cursor-pointer shadow-lg shadow-black/10">
+                    </a>
+                    <a href="{{ route('plans.index') }}" class="flex items-center justify-center gap-2 py-3 rounded-xl bg-white hover:bg-white/90 text-sm font-semibold text-primary transition-all cursor-pointer shadow-lg shadow-black/10">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z"/></svg>
                         Upgrade
-                    </button>
+                    </a>
                 </div>
             </div>
         </div>
@@ -112,7 +122,7 @@
         {{-- Quick Actions --}}
         <div>
             <p class="text-xs text-text/35 text-center mb-3">Ways to earn</p>
-            <div class="grid grid-cols-4 gap-3">
+            <div class="grid grid-cols-3 gap-3">
                 <a href="#" class="flex flex-col items-center gap-2 p-3 bg-white dark:bg-neutral-900 rounded-xl border border-gray-100 dark:border-neutral-800 hover:border-primary/30 hover:shadow-md transition-all group">
                     <div class="w-10 h-10 bg-gradient-to-br from-primary/10 to-primary/5 rounded-full flex items-center justify-center group-hover:from-primary/20 group-hover:to-primary/10 transition-colors">
                         <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 18.75a6 6 0 006-6v-1.5m-6 7.5a6 6 0 01-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 01-3-3V4.5a3 3 0 116 0v8.25a3 3 0 01-3 3z"/></svg>
@@ -125,33 +135,29 @@
                     </div>
                     <span class="text-[11px] font-medium text-text/60 text-center">Word Game</span>
                 </a>
-                <a href="#" class="flex flex-col items-center gap-2 p-3 bg-white dark:bg-neutral-900 rounded-xl border border-gray-100 dark:border-neutral-800 hover:border-green-300 hover:shadow-md transition-all group">
-                    <div class="w-10 h-10 bg-gradient-to-br from-green-50 to-green-100/50 dark:from-green-900/20 dark:to-green-900/10 rounded-full flex items-center justify-center group-hover:from-green-100 group-hover:to-green-50 transition-colors">
-                        <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <div class="flex flex-col items-center gap-2 p-3 bg-white/50 dark:bg-neutral-900/50 rounded-xl border border-gray-100/50 dark:border-neutral-800/50 opacity-50 cursor-not-allowed">
+                    <div class="w-10 h-10 bg-gradient-to-br from-gray-50 to-gray-100/50 dark:from-gray-900/20 dark:to-gray-900/10 rounded-full flex items-center justify-center">
+                        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                     </div>
-                    <span class="text-[11px] font-medium text-text/60 text-center">Tasks</span>
-                </a>
-                <a href="#" class="flex flex-col items-center gap-2 p-3 bg-white dark:bg-neutral-900 rounded-xl border border-gray-100 dark:border-neutral-800 hover:border-amber-300 hover:shadow-md transition-all group">
-                    <div class="w-10 h-10 bg-gradient-to-br from-amber-50 to-amber-100/50 dark:from-amber-900/20 dark:to-amber-900/10 rounded-full flex items-center justify-center group-hover:from-amber-100 group-hover:to-amber-50 transition-colors">
-                        <svg class="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3v11.25A2.25 2.25 0 006 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0118 16.5h-2.25m-7.5 0h7.5m-7.5 0l-1 3m8.5-3l1 3m0 0l.5 1.5m-.5-1.5h-9.5m0 0l-.5 1.5"/></svg>
-                    </div>
-                    <span class="text-[11px] font-medium text-text/60 text-center">Sponsored</span>
-                </a>
+                    <span class="text-[11px] font-medium text-text/40 text-center">Coming Soon</span>
+                </div>
             </div>
         </div>
 
         {{-- Next Step Banner --}}
-        <a href="#" class="flex items-center gap-4 bg-primary/5 dark:bg-primary/10 border border-primary/10 rounded-2xl p-4 hover:bg-primary/10 transition-colors group">
-            <div class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center shrink-0">
-                <span class="text-sm font-bold text-primary">0/3</span>
-            </div>
-            <div class="flex-1 min-w-0">
-                <p class="text-[10px] font-semibold text-primary uppercase tracking-wider">Next step to start earning</p>
-                <p class="text-sm font-semibold text-text">Activate a plan</p>
-                <p class="text-xs text-text/40">Unlock all earning features</p>
-            </div>
-            <svg class="w-5 h-5 text-text/30 group-hover:text-primary transition-colors shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg>
-        </a>
+        @if(!$currentPlan)
+            <a href="{{ route('plans.index') }}" class="flex items-center gap-4 bg-primary/5 dark:bg-primary/10 border border-primary/10 rounded-2xl p-4 hover:bg-primary/10 transition-colors group">
+                <div class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center shrink-0">
+                    <span class="text-sm font-bold text-primary">0/3</span>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <p class="text-[10px] font-semibold text-primary uppercase tracking-wider">Next step to start earning</p>
+                    <p class="text-sm font-semibold text-text">Activate a plan</p>
+                    <p class="text-xs text-text/40">Unlock all earning features</p>
+                </div>
+                <svg class="w-5 h-5 text-text/30 group-hover:text-primary transition-colors shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg>
+            </a>
+        @endif
 
         {{-- Overview Stats --}}
         <div>
@@ -190,12 +196,16 @@
                         <p class="text-xs text-text/40">Earn rewards when friends join</p>
                     </div>
                 </div>
-                <span class="text-[10px] font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-full uppercase tracking-wider">Free Plan</span>
+                @if($currentPlan)
+                    <span class="text-[10px] font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-full uppercase tracking-wider">{{ $currentPlan->name }}</span>
+                @else
+                    <span class="text-[10px] font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-full uppercase tracking-wider">Free Plan</span>
+                @endif
             </div>
 
             <div class="flex items-center gap-2 mb-4">
                 <div class="flex-1 bg-gray-50 dark:bg-neutral-800 rounded-lg px-3 py-2.5 text-xs text-text/50 font-mono truncate">
-                    {{ route('register') }}?ref={{ auth()->user()->username }}
+                    {{ route('register') }}?ref={{ $user->username }}
                 </div>
                 <button class="px-4 py-2.5 bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 text-white text-xs font-semibold rounded-lg transition-all shrink-0 cursor-pointer shadow-sm hover:shadow-md">
                     Copy
@@ -224,17 +234,17 @@
 
         {{-- Quick Links --}}
         <div class="grid grid-cols-2 gap-3">
-            <a href="#" class="flex items-center gap-3 bg-white dark:bg-neutral-900 rounded-xl border border-gray-100 dark:border-neutral-800 p-4 hover:border-blue-300 hover:shadow-md transition-all group">
+            <a href="{{ route('plans.index') }}" class="flex items-center gap-3 bg-white dark:bg-neutral-900 rounded-xl border border-gray-100 dark:border-neutral-800 p-4 hover:border-blue-300 hover:shadow-md transition-all group">
                 <div class="w-10 h-10 bg-gradient-to-br from-blue-50 to-blue-100/50 dark:from-blue-900/20 dark:to-blue-900/10 rounded-xl flex items-center justify-center shrink-0">
                     <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z"/></svg>
                 </div>
                 <div class="flex-1 min-w-0">
                     <p class="text-sm font-semibold text-text">Ways to earn</p>
-                    <p class="text-[11px] text-text/40">4 activities</p>
+                    <p class="text-[11px] text-text/40">3 activities</p>
                 </div>
                 <svg class="w-4 h-4 text-text/20 group-hover:text-blue-500 transition-colors shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg>
             </a>
-            <a href="#" class="flex items-center gap-3 bg-white dark:bg-neutral-900 rounded-xl border border-gray-100 dark:border-neutral-800 p-4 hover:border-amber-300 hover:shadow-md transition-all group">
+            <a href="{{ route('plans.index') }}" class="flex items-center gap-3 bg-white dark:bg-neutral-900 rounded-xl border border-gray-100 dark:border-neutral-800 p-4 hover:border-amber-300 hover:shadow-md transition-all group">
                 <div class="w-10 h-10 bg-gradient-to-br from-amber-50 to-amber-100/50 dark:from-amber-900/20 dark:to-amber-900/10 rounded-xl flex items-center justify-center shrink-0">
                     <svg class="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 18.75h-9m9 0a3 3 0 013 3h-15a3 3 0 013-3m9 0v-3.375c0-.621-.503-1.125-1.125-1.125h-.871M7.5 18.75v-3.375c0-.621.504-1.125 1.125-1.125h.872m5.007 0H9.497m5.007 0a7.454 7.454 0 01-.982-3.172M9.497 14.25a7.454 7.454 0 00.981-3.172M5.25 4.236c-.982.143-1.954.317-2.916.52A6.003 6.003 0 007.73 9.728M5.25 4.236V4.5c0 2.108.966 3.99 2.48 5.228M5.25 4.236V2.721C7.456 2.41 9.71 2.25 12 2.25c2.291 0 4.545.16 6.75.47v1.516M18.75 4.236c.982.143 1.954.317 2.916.52A6.003 6.003 0 0016.27 9.728M18.75 4.236V4.5c0 2.108-.966 3.99-2.48 5.228m0 0a6.023 6.023 0 01-2.77.665 6.023 6.023 0 01-2.77-.665"/></svg>
                 </div>
@@ -247,25 +257,29 @@
         </div>
 
         {{-- Upgrade Banner --}}
-        <a href="#" class="block bg-gradient-to-r from-primary to-orange-600 rounded-2xl p-5 relative overflow-hidden group hover:shadow-lg transition-shadow">
-            <div class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
-            <div class="relative flex items-center gap-4">
-                <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center shrink-0">
-                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z"/></svg>
+        @if(!$currentPlan)
+            <a href="{{ route('plans.index') }}" class="block bg-gradient-to-r from-primary to-orange-600 rounded-2xl p-5 relative overflow-hidden group hover:shadow-lg transition-shadow">
+                <div class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
+                <div class="relative flex items-center gap-4">
+                    <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center shrink-0">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z"/></svg>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-sm font-semibold text-white">Upgrade your account</p>
+                        <p class="text-xs text-white/70">Unlock Voice Earn, Word Game, higher rewards & payouts</p>
+                    </div>
+                    <svg class="w-5 h-5 text-white/60 group-hover:text-white transition-colors shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg>
                 </div>
-                <div class="flex-1 min-w-0">
-                    <p class="text-sm font-semibold text-white">Upgrade your account</p>
-                    <p class="text-xs text-white/70">Unlock Voice Earn, Word Game, higher rewards & payouts</p>
-                </div>
-                <svg class="w-5 h-5 text-white/60 group-hover:text-white transition-colors shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg>
-            </div>
-        </a>
+            </a>
+        @endif
 
         {{-- Earn Now --}}
         <div id="earn">
             <div class="flex items-center justify-between mb-3">
                 <h2 class="text-sm font-semibold text-text">Earn now</h2>
-                <a href="#" class="text-xs font-medium text-primary hover:text-primary/80">Activate plan</a>
+                @if(!$currentPlan)
+                    <a href="{{ route('plans.index') }}" class="text-xs font-medium text-primary hover:text-primary/80">Activate plan</a>
+                @endif
             </div>
             <div class="grid grid-cols-2 gap-3">
                 <a href="#" class="bg-white dark:bg-neutral-900 rounded-xl border border-gray-100 dark:border-neutral-800 p-5 text-center hover:border-primary/30 hover:shadow-md transition-all">
@@ -274,7 +288,7 @@
                     </div>
                     <p class="text-sm font-semibold text-text mb-0.5">Voice Earn</p>
                     <p class="text-xs text-primary font-medium">+&#8358;0.00/session</p>
-                    <p class="text-[10px] text-text/30 mt-1">Activate plan</p>
+                    <p class="text-[10px] text-text/30 mt-1">{{ $currentPlan ? 'Start earning' : 'Activate plan' }}</p>
                 </a>
                 <a href="#" class="bg-white dark:bg-neutral-900 rounded-xl border border-gray-100 dark:border-neutral-800 p-5 text-center hover:border-blue-300 hover:shadow-md transition-all">
                     <div class="w-10 h-10 bg-gradient-to-br from-blue-50 to-blue-100/50 dark:from-blue-900/20 dark:to-blue-900/10 rounded-full flex items-center justify-center mx-auto mb-3">
@@ -282,23 +296,7 @@
                     </div>
                     <p class="text-sm font-semibold text-text mb-0.5">Word Game</p>
                     <p class="text-xs text-primary font-medium">+&#8358;0.00/word</p>
-                    <p class="text-[10px] text-text/30 mt-1">Activate plan</p>
-                </a>
-                <a href="#" class="bg-white dark:bg-neutral-900 rounded-xl border border-gray-100 dark:border-neutral-800 p-5 text-center hover:border-green-300 hover:shadow-md transition-all">
-                    <div class="w-10 h-10 bg-gradient-to-br from-green-50 to-green-100/50 dark:from-green-900/20 dark:to-green-900/10 rounded-full flex items-center justify-center mx-auto mb-3">
-                        <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                    </div>
-                    <p class="text-sm font-semibold text-text mb-0.5">Tasks</p>
-                    <p class="text-xs text-primary font-medium">+&#8358;0/task</p>
-                    <p class="text-[10px] text-text/30 mt-1">All done</p>
-                </a>
-                <a href="#" class="bg-white dark:bg-neutral-900 rounded-xl border border-gray-100 dark:border-neutral-800 p-5 text-center hover:border-amber-300 hover:shadow-md transition-all">
-                    <div class="w-10 h-10 bg-gradient-to-br from-amber-50 to-amber-100/50 dark:from-amber-900/20 dark:to-amber-900/10 rounded-full flex items-center justify-center mx-auto mb-3">
-                        <svg class="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3v11.25A2.25 2.25 0 006 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0118 16.5h-2.25m-7.5 0h7.5m-7.5 0l-1 3m8.5-3l1 3m0 0l.5 1.5m-.5-1.5h-9.5m0 0l-.5 1.5"/></svg>
-                    </div>
-                    <p class="text-sm font-semibold text-text mb-0.5">Sponsored</p>
-                    <p class="text-xs text-primary font-medium">+&#8358;0.00/post</p>
-                    <p class="text-[10px] text-text/30 mt-1">Activate plan</p>
+                    <p class="text-[10px] text-text/30 mt-1">{{ $currentPlan ? 'Start earning' : 'Activate plan' }}</p>
                 </a>
             </div>
         </div>

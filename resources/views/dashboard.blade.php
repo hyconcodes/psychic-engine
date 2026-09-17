@@ -106,12 +106,16 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-2 gap-3">
-                    <a href="{{ route('plans.index') }}" class="flex items-center justify-center gap-2 py-3 rounded-xl bg-white/10 hover:bg-white/20 backdrop-blur-md text-sm font-semibold text-white transition-all cursor-pointer border border-white/20 shadow-[inset_0_1px_1px_rgba(255,255,255,0.2),0_4px_12px_rgba(0,0,0,0.1)]">
+                <div class="grid grid-cols-3 gap-2">
+                    <a href="{{ route('wallet.index') }}" class="flex items-center justify-center gap-1.5 py-3 rounded-xl bg-white hover:bg-white/90 text-sm font-semibold text-primary transition-all cursor-pointer shadow-lg shadow-black/10">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m6-6H6"/></svg>
+                        Fund
+                    </a>
+                    <a href="#" class="flex items-center justify-center gap-1.5 py-3 rounded-xl bg-white/10 hover:bg-white/20 backdrop-blur-md text-sm font-semibold text-white transition-all cursor-pointer border border-white/20">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg>
                         Withdraw
                     </a>
-                    <a href="{{ route('plans.index') }}" class="flex items-center justify-center gap-2 py-3 rounded-xl bg-white hover:bg-white/90 text-sm font-semibold text-primary transition-all cursor-pointer shadow-lg shadow-black/10">
+                    <a href="{{ route('plans.index') }}" class="flex items-center justify-center gap-1.5 py-3 rounded-xl bg-white/10 hover:bg-white/20 backdrop-blur-md text-sm font-semibold text-white transition-all cursor-pointer border border-white/20">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z"/></svg>
                         Upgrade
                     </a>

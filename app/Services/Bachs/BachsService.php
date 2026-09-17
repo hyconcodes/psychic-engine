@@ -105,4 +105,44 @@ class BachsService implements BachsServiceInterface
             return [];
         }
     }
+
+    public function createProduct(string $name, string $amount, string $currency = 'NGN', ?string $description = null): string
+    {
+        $payload = [
+            'name' => $name,
+            'description' => $description ?? "VocalPay - {$name}",
+            'price' => [
+                'currency' => $currency,
+                'amount' => $amount,
+            ],
+        ];
+
+        try {
+            $response = Http::withHeaders([
+                'Authorization' => "Bearer {$this->apiKey}",
+                'Accept' => 'application/json',
+            ])->timeout(30)->post("{$this->baseUrl}/v1/products", $payload);
+
+            if ($response->failed()) {
+                Log::error('Bachs product creation failed', [
+                    'name' => $name,
+                    'status' => $response->status(),
+                    'body' => $response->body(),
+                ]);
+
+                throw BachsException::apiError(
+                    $response->json('detail', 'Product creation failed'),
+                    $response->status()
+                );
+            }
+
+            return $response->json('id');
+        } catch (BachsException $e) {
+            throw $e;
+        } catch (\Exception $e) {
+            Log::error('Bachs product connection failed', ['name' => $name, 'error' => $e->getMessage()]);
+
+            throw BachsException::networkError($e);
+        }
+    }
 }

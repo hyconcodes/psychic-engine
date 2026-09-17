@@ -13,4 +13,6 @@ interface BachsServiceInterface
     public function verifyCheckoutSession(string $checkoutId): CheckoutSessionVerification;
 
     public function getPaymentMethods(): array;
+
+    public function createProduct(string $name, string $amount, string $currency = 'NGN', ?string $description = null): string;
 }

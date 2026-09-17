@@ -38,14 +38,18 @@ class PlanController extends Controller
                 ->with('toast_variant', 'warning');
         }
 
+        if (! $plan->bachs_product_id) {
+            return redirect()->route('plans.index')
+                ->with('toast_message', 'This plan is not available for purchase yet. Please try again later.')
+                ->with('toast_variant', 'error');
+        }
+
         $reference = Transaction::generateReference();
 
         $checkoutRequest = new CheckoutSessionRequest(
             customerEmail: $user->email,
             customerName: $user->name,
-            productName: "VocalPay - {$plan->name}",
-            currency: 'NGN',
-            amount: number_format((float) $plan->price, 2, '.', ''),
+            productId: $plan->bachs_product_id,
             successUrl: route('plans.callback').'?checkout_id={CHECKOUT_ID}',
             cancelUrl: route('plans.index'),
             paymentMethodTypes: ['NGN_BANK_TRANSFER', 'CRYPTO'],

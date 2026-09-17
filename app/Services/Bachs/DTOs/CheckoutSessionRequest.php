@@ -7,9 +7,7 @@ readonly class CheckoutSessionRequest
     public function __construct(
         public string $customerEmail,
         public string $customerName,
-        public string $productName,
-        public string $currency,
-        public string $amount,
+        public string $productId,
         public string $successUrl,
         public string $cancelUrl,
         public array $paymentMethodTypes = ['NGN_BANK_TRANSFER'],
@@ -26,14 +24,7 @@ readonly class CheckoutSessionRequest
             ],
             'product_cart' => [
                 [
-                    'product_data' => [
-                        'name' => $this->productName,
-                        'price' => [
-                            'currency' => $this->currency,
-                            'amount' => $this->amount,
-                        ],
-                    ],
-                    'quantity' => 1,
+                    'product_id' => $this->productId,
                 ],
             ],
             'payment_method_types' => $this->paymentMethodTypes,

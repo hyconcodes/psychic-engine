@@ -10,6 +10,7 @@ class Plan extends Model
     protected $fillable = [
         'name',
         'slug',
+        'bachs_product_id',
         'price',
         'voice_earn_per_session',
         'word_game_per_word',

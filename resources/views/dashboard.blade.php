@@ -20,7 +20,7 @@
                 <div>
                     <p class="text-[11px] text-text/40 tracking-wide">Good {{ now()->format('A') < 12 ? 'morning' : (now()->format('A') < 17 ? 'afternoon' : 'evening') }}</p>
                     <div class="flex items-center gap-1.5 mt-0.5">
-                        <span class="text-base font-extrabold bg-gradient-to-r from-primary via-secondary to-primary bg-clip-text text-transparent leading-tight" style="font-family: 'DM Serif Display', Georgia, serif;">{{ '@' . $user->username }}</span>
+                        <span class="text-base font-extrabold bg-gradient-to-r from-primary via-secondary to-primary bg-clip-text text-transparent leading-tight" style="font-family: 'DM Serif Display', Georgia, serif;">{{ $user->name }}</span>
                     </div>
                 </div>
             </div>
@@ -42,7 +42,7 @@
                 <div>
                     <h1 class="text-xl font-bold bg-gradient-to-r from-primary via-secondary to-primary bg-clip-text text-transparent" style="font-family: 'DM Serif Display', Georgia, serif;">Dashboard</h1>
                     <div class="flex items-center gap-1.5 mt-0.5">
-                        <span class="text-lg font-extrabold bg-gradient-to-r from-primary via-secondary to-primary bg-clip-text text-transparent" style="font-family: 'DM Serif Display', Georgia, serif;">{{ '@' . $user->username }}</span>
+                        <span class="text-lg font-extrabold bg-gradient-to-r from-primary via-secondary to-primary bg-clip-text text-transparent" style="font-family: 'DM Serif Display', Georgia, serif;">{{ $user->name }}</span>
                         <span class="text-xs text-text/30">&middot; Welcome back</span>
                     </div>
                 </div>

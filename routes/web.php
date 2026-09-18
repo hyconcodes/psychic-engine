@@ -16,6 +16,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('plans', [PlanController::class, 'index'])->name('plans.index');
     Route::post('plans/{plan:slug}/subscribe', [PlanController::class, 'subscribe'])->name('plans.subscribe');
     Route::get('plans/callback', [PlanController::class, 'callback'])->name('plans.callback');
+    Route::get('plans/cancelled', [PlanController::class, 'cancelled'])->name('plans.cancelled');
 
     Route::get('transactions', [TransactionController::class, 'index'])->name('transactions.index');
 });

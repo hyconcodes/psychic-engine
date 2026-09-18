@@ -8,6 +8,7 @@ use App\Models\Transaction;
 use App\Models\UserSubscription;
 use App\Services\Bachs\Contracts\BachsServiceInterface;
 use App\Services\Bachs\DTOs\CheckoutSessionRequest;
+use App\Services\Bachs\DTOs\CheckoutSessionVerification;
 use App\Services\Bachs\Exceptions\BachsException;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -57,7 +58,7 @@ class PlanController extends Controller
             customerName: $user->name,
             productId: $plan->bachs_product_id,
             successUrl: route('plans.callback').'?checkout_id={CHECKOUT_ID}',
-            cancelUrl: route('plans.index'),
+            cancelUrl: route('plans.cancelled'),
             paymentMethodTypes: ['NGN_BANK_TRANSFER', 'CRYPTO'],
             reference: $reference,
             metadata: [
@@ -101,14 +102,12 @@ class PlanController extends Controller
         }
     }
 
-    public function callback(Request $request): RedirectResponse
+    public function callback(Request $request): View
     {
         $checkoutId = $request->query('checkout_id');
 
         if (! $checkoutId) {
-            return redirect()->route('dashboard')
-                ->with('toast_message', 'Invalid payment callback.')
-                ->with('toast_variant', 'error');
+            return view('payment.status', $this->status('error', 'Invalid payment reference.'));
         }
 
         try {
@@ -117,18 +116,42 @@ class PlanController extends Controller
             if ($verification->isSuccessful()) {
                 $this->activatePlan->handle($checkoutId, $verification->chargeId);
 
-                return redirect()->route('dashboard')
-                    ->with('toast_message', 'Plan activated successfully! Start earning now.')
-                    ->with('toast_variant', 'success');
+                return view('payment.status', $this->status('success', 'Your plan has been activated. Start earning now!', $this->receipt($checkoutId, $verification)));
             }
 
-            return redirect()->route('plans.index')
-                ->with('toast_message', 'Payment was not completed. Please try again.')
-                ->with('toast_variant', 'warning');
+            if ($verification->status === 'expired' || $verification->paymentStatus === 'failed') {
+                return view('payment.status', $this->status('failed', 'Your payment did not complete. You can try again.', $this->receipt($checkoutId, $verification)));
+            }
+
+            return view('payment.status', $this->status('processing', 'Your payment is being confirmed. This can take a few minutes for bank transfers.', $this->receipt($checkoutId, $verification)));
         } catch (BachsException) {
-            return redirect()->route('plans.index')
-                ->with('toast_message', 'Could not verify payment. Please contact support.')
-                ->with('toast_variant', 'error');
+            return view('payment.status', $this->status('error', 'We could not verify your payment. Please contact support if this persists.'));
         }
+    }
+
+    public function cancelled(): View
+    {
+        return view('payment.status', $this->status('cancelled', 'You cancelled the payment. No charge was made.'));
+    }
+
+    private function status(string $state, string $message, array $receipt = []): array
+    {
+        return array_merge([
+            'state' => $state,
+            'message' => $message,
+        ], $receipt);
+    }
+
+    private function receipt(string $checkoutId, CheckoutSessionVerification $verification): array
+    {
+        $transaction = Transaction::where('bachs_checkout_id', $checkoutId)->first();
+
+        return [
+            'checkout_id' => $checkoutId,
+            'plan_name' => $transaction?->metadata['plan_name'] ?? $transaction?->description ?? 'Plan',
+            'amount' => $transaction?->amount ?? $verification->amount,
+            'reference' => $transaction?->reference ?? $verification->chargeId,
+            'date' => $transaction?->created_at ?? now(),
+        ];
     }
 }

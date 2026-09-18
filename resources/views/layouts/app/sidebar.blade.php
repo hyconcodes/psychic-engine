@@ -6,7 +6,7 @@
     <body class="min-h-screen bg-gray-50/60 text-text dark:bg-neutral-950">
 
         {{-- Desktop Sidebar --}}
-        <aside class="fixed inset-y-0 left-0 z-50 w-72 hidden lg:flex flex-col border-e border-gray-100 bg-white dark:border-neutral-800 dark:bg-neutral-900">
+        <aside class="fixed inset-y-0 left-0 z-50 w-72 hidden lg:flex flex-col border-e border-gray-100 bg-gradient-to-b from-white via-white to-orange-50/60 shadow-[4px_0_24px_rgba(0,0,0,0.04)] dark:border-neutral-800 dark:from-neutral-900 dark:via-neutral-900 dark:to-neutral-950">
             {{-- Logo --}}
             <div class="flex items-center gap-3 px-5 h-16 border-b border-gray-100 dark:border-neutral-800 shrink-0">
                 <a href="{{ route('dashboard') }}" class="flex items-center gap-2.5" wire:navigate>
@@ -85,8 +85,22 @@
                 </div>
             </nav>
 
-            {{-- Bottom: Dark Mode Toggle + User + Logout --}}
-            <div class="shrink-0 border-t border-gray-100 dark:border-neutral-800 p-3 space-y-1">
+            {{-- Bottom: User + Dark Mode Toggle + Logout --}}
+            <div class="shrink-0 border-t border-gray-100 dark:border-neutral-800 p-3 space-y-2">
+                {{-- User Card --}}
+                <div class="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-white dark:bg-white/5 border border-gray-100 dark:border-neutral-800 shadow-sm">
+                    <div class="relative shrink-0">
+                        <div class="w-9 h-9 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center text-white text-xs font-bold ring-2 ring-white dark:ring-neutral-800">
+                            {{ auth()->user()->initials() }}
+                        </div>
+                        <div class="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-400 rounded-full border-2 border-white dark:border-neutral-800"></div>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-sm font-semibold text-text truncate">{{ auth()->user()->name }}</p>
+                        <p class="text-[11px] text-text/40 truncate">{{ '@' . auth()->user()->username }}</p>
+                    </div>
+                </div>
+
                 {{-- Dark Mode Toggle --}}
                 <button
                     x-data

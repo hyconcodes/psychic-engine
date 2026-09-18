@@ -99,3 +99,14 @@ select:focus[data-flux-control] {
 .sidebar-link-community:hover {
     background: linear-gradient(135deg, var(--color-secondary) 0%, var(--color-primary) 100%);
 }
+
+@keyframes scale-in {
+    from {
+        transform: scale(0.5);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}

@@ -145,4 +145,50 @@ class BachsService implements BachsServiceInterface
             throw BachsException::networkError($e);
         }
     }
+
+    public function verifyWebhookSignature(string $rawBody, ?string $timestampHeader, ?string $signatureHeader): bool
+    {
+        $secret = config('bachs.webhook_secret');
+        $tolerance = (int) config('bachs.webhook_tolerance', 300);
+
+        if (! $secret || ! $timestampHeader || ! $signatureHeader) {
+            return false;
+        }
+
+        $parts = [];
+        foreach (explode(',', $signatureHeader) as $part) {
+            if (str_contains($part, '=')) {
+                [$key, $value] = explode('=', $part, 2);
+                $parts[$key] = $value;
+            }
+        }
+
+        $timestamp = (int) ($parts['t'] ?? 0);
+
+        if ($timestamp <= 0 || abs(time() - $timestamp) > $tolerance) {
+            return false;
+        }
+
+        $signatures = [];
+        foreach (explode(',', $signatureHeader) as $part) {
+            if (str_starts_with($part, 'v1=')) {
+                $signatures[] = substr($part, 3);
+            }
+        }
+
+        if ($signatures === []) {
+            return false;
+        }
+
+        $message = $timestamp.'.'.$rawBody;
+        $expected = hash_hmac('sha256', $message, $secret);
+
+        foreach ($signatures as $signature) {
+            if (hash_equals($expected, $signature)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }

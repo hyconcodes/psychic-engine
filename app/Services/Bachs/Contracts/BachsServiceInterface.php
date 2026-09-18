@@ -15,4 +15,6 @@ interface BachsServiceInterface
     public function getPaymentMethods(): array;
 
     public function createProduct(string $name, string $amount, string $currency = 'NGN', ?string $description = null): string;
+
+    public function verifyWebhookSignature(string $rawBody, ?string $timestampHeader, ?string $signatureHeader): bool;
 }

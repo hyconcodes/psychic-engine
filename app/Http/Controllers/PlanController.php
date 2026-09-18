@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\ActivatePlan;
 use App\Models\Plan;
 use App\Models\Transaction;
 use App\Models\UserSubscription;
@@ -18,6 +19,7 @@ class PlanController extends Controller
 {
     public function __construct(
         private readonly BachsServiceInterface $bachs,
+        private readonly ActivatePlan $activatePlan,
     ) {}
 
     public function index(): View
@@ -113,7 +115,7 @@ class PlanController extends Controller
             $verification = $this->bachs->verifyCheckoutSession($checkoutId);
 
             if ($verification->isSuccessful()) {
-                $this->activatePlan($checkoutId, $verification->chargeId);
+                $this->activatePlan->handle($checkoutId, $verification->chargeId);
 
                 return redirect()->route('dashboard')
                     ->with('toast_message', 'Plan activated successfully! Start earning now.')
@@ -128,32 +130,5 @@ class PlanController extends Controller
                 ->with('toast_message', 'Could not verify payment. Please contact support.')
                 ->with('toast_variant', 'error');
         }
-    }
-
-    private function activatePlan(string $checkoutId, ?string $chargeId): void
-    {
-        DB::transaction(function () use ($checkoutId, $chargeId) {
-            $subscription = UserSubscription::where('bachs_checkout_id', $checkoutId)
-                ->where('status', 'pending')
-                ->firstOrFail();
-
-            $subscription->update([
-                'status' => 'active',
-                'bachs_charge_id' => $chargeId,
-                'activated_at' => now(),
-            ]);
-
-            Transaction::where('bachs_checkout_id', $checkoutId)
-                ->where('status', 'pending')
-                ->update([
-                    'status' => 'successful',
-                    'bachs_charge_id' => $chargeId,
-                ]);
-
-            $user = $subscription->user;
-            if (! $user->wallet) {
-                $user->wallet()->create(['balance' => 0]);
-            }
-        });
     }
 }

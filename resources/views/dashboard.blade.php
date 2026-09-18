@@ -5,7 +5,7 @@
         $wallet = $user->wallet;
         $balance = $wallet ? $wallet->formattedBalance() : '₦0.00';
     @endphp
-    <div x-data="{ showBanner: true }" class="space-y-6">
+    <div class="space-y-6">
 
         {{-- Mobile Header --}}
         <div class="flex items-center justify-between lg:hidden">
@@ -50,17 +50,6 @@
             <button class="w-10 h-10 flex items-center justify-center rounded-full border border-gray-200 dark:border-neutral-700 hover:bg-gray-50 dark:hover:bg-neutral-800 transition-colors relative">
                 <svg class="w-5 h-5 text-text/50" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0"/></svg>
                 <span class="absolute -top-0.5 -right-0.5 w-3 h-3 bg-primary rounded-full border-2 border-white dark:border-neutral-900"></span>
-            </button>
-        </div>
-
-        {{-- Warning Banner --}}
-        <div x-show="showBanner" x-transition class="bg-amber-50 dark:bg-amber-900/15 border border-amber-200 dark:border-amber-800/30 rounded-xl px-4 py-3 flex items-start gap-3">
-            <svg class="w-5 h-5 text-amber-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg>
-            <div class="flex-1">
-                <p class="text-xs font-medium text-amber-700 dark:text-amber-400 leading-relaxed">Please complete all tasks properly before requesting payouts. Incomplete or low-quality submissions may result in payment delays or deductions.</p>
-            </div>
-            <button @click="showBanner = false" class="shrink-0 text-amber-400 hover:text-amber-600 cursor-pointer">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
             </button>
         </div>
 
@@ -203,11 +192,37 @@
                 @endif
             </div>
 
-            <div class="flex items-center gap-2 mb-4">
+            <div
+                x-data="{
+                    referralLink: @js(route('register') . '?ref=' . $user->username),
+                    async copyReferralLink() {
+                        try {
+                            await navigator.clipboard.writeText(this.referralLink);
+                            $flux.toast('{{ __('Referral link copied.') }}', { variant: 'success' });
+                        } catch {
+                            const textarea = document.createElement('textarea');
+                            textarea.value = this.referralLink;
+                            textarea.style.position = 'fixed';
+                            textarea.style.opacity = '0';
+                            document.body.appendChild(textarea);
+                            textarea.select();
+
+                            const copied = document.execCommand('copy');
+                            textarea.remove();
+
+                            $flux.toast(
+                                copied ? '{{ __('Referral link copied.') }}' : '{{ __('Unable to copy the referral link.') }}',
+                                { variant: copied ? 'success' : 'danger' },
+                            );
+                        }
+                    }
+                }"
+                class="flex items-center gap-2 mb-4"
+            >
                 <div class="flex-1 bg-gray-50 dark:bg-neutral-800 rounded-lg px-3 py-2.5 text-xs text-text/50 font-mono truncate">
                     {{ route('register') }}?ref={{ $user->username }}
                 </div>
-                <button class="px-4 py-2.5 bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 text-white text-xs font-semibold rounded-lg transition-all shrink-0 cursor-pointer shadow-sm hover:shadow-md">
+                <button type="button" @click="copyReferralLink()" class="px-4 py-2.5 bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 text-white text-xs font-semibold rounded-lg transition-all shrink-0 cursor-pointer shadow-sm hover:shadow-md">
                     Copy
                 </button>
             </div>

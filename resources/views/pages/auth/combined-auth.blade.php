@@ -148,7 +148,7 @@
 
         {{-- Register Form --}}
         <div x-show="activeTab === 'register'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100">
-            <form method="POST" action="{{ route('register.store') }}" class="flex flex-col gap-4">
+            <form method="POST" action="{{ route('register.store') }}" x-data="{ submitting: false, showPassword: false }" @submit="if (submitting) { $event.preventDefault(); return; } submitting = true" class="flex flex-col gap-4">
                 @csrf
                 <div>
                     <label for="reg-name" class="block text-sm font-medium text-text mb-1.5">{{ __('Full name') }}</label>
@@ -173,8 +173,23 @@
                         type="text"
                         value="{{ old('username') }}"
                         required
+                        maxlength="8"
                         autocomplete="username"
-                        placeholder="e.g. alexjohnson"
+                        placeholder="e.g. alexjohn"
+                        class="w-full rounded-xl border border-gray-200 dark:border-neutral-600 bg-white dark:bg-neutral-800 px-4 py-3 text-sm text-text placeholder-text/30 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors"
+                    >
+                </div>
+
+                <div>
+                    <label for="reg-email" class="block text-sm font-medium text-text mb-1.5">{{ __('Email address') }}</label>
+                    <input
+                        id="reg-email"
+                        name="email"
+                        type="email"
+                        value="{{ old('email') }}"
+                        required
+                        autocomplete="email"
+                        placeholder="you@example.com"
                         class="w-full rounded-xl border border-gray-200 dark:border-neutral-600 bg-white dark:bg-neutral-800 px-4 py-3 text-sm text-text placeholder-text/30 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors"
                     >
                 </div>
@@ -206,35 +221,39 @@
                 </div>
 
                 <div>
-                    <label for="reg-email" class="block text-sm font-medium text-text mb-1.5">{{ __('Email address') }}</label>
-                    <input
-                        id="reg-email"
-                        name="email"
-                        type="email"
-                        value="{{ old('email') }}"
-                        required
-                        autocomplete="email"
-                        placeholder="you@example.com"
-                        class="w-full rounded-xl border border-gray-200 dark:border-neutral-600 bg-white dark:bg-neutral-800 px-4 py-3 text-sm text-text placeholder-text/30 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors"
-                    >
-                </div>
-
-                <div>
                     <label for="reg-password" class="block text-sm font-medium text-text mb-1.5">{{ __('Create password') }}</label>
-                    <input
-                        id="reg-password"
-                        name="password"
-                        type="password"
-                        required
-                        autocomplete="new-password"
-                        placeholder="At least 8 characters"
-                        passwordrules="{{ \Illuminate\Validation\Rules\Password::defaults()->toPasswordRulesString() }}"
-                        class="w-full rounded-xl border border-gray-200 dark:border-neutral-600 bg-white dark:bg-neutral-800 px-4 py-3 text-sm text-text placeholder-text/30 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors"
-                    >
+                    <div class="relative">
+                        <input
+                            id="reg-password"
+                            name="password"
+                            :type="showPassword ? 'text' : 'password'"
+                            required
+                            autocomplete="new-password"
+                            placeholder="At least 8 characters"
+                            passwordrules="{{ \Illuminate\Validation\Rules\Password::defaults()->toPasswordRulesString() }}"
+                            class="w-full rounded-xl border border-gray-200 dark:border-neutral-600 bg-white dark:bg-neutral-800 px-4 py-3 pr-12 text-sm text-text placeholder-text/30 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors"
+                        >
+                        <button type="button" @click="showPassword = !showPassword" :aria-pressed="showPassword" aria-label="{{ __('Toggle password visibility') }}" class="absolute inset-y-0 right-0 flex items-center px-4 text-text/40 hover:text-primary transition-colors cursor-pointer">
+                            <template x-if="!showPassword">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12s3.75-6.75 9.75-6.75S21.75 12 21.75 12 18 18.75 12 18.75 2.25 12 2.25 12z"/><path stroke-linecap="round" stroke-linejoin="round" d="M14.25 12a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z"/></svg>
+                            </template>
+                            <template x-if="showPassword">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M3 3l18 18M10.584 10.587A2.25 2.25 0 0013.5 13.5M9.88 5.275A9.82 9.82 0 0112 5.25c6 0 9.75 6.75 9.75 6.75a18.09 18.09 0 01-3.197 4.044M6.228 6.228A18.13 18.13 0 002.25 12S6 18.75 12 18.75a9.9 9.9 0 003.725-.725"/></svg>
+                            </template>
+                        </button>
+                    </div>
                 </div>
 
-                <button type="submit" class="w-full bg-primary hover:bg-primary/90 text-white font-semibold py-3.5 rounded-full text-sm transition-colors mt-2 cursor-pointer">
-                    {{ __('Create Free Account') }} &rarr;
+                <button type="submit" :disabled="submitting" class="w-full bg-primary hover:bg-primary/90 disabled:opacity-60 disabled:cursor-not-allowed text-white font-semibold py-3.5 rounded-full text-sm transition-colors mt-2 cursor-pointer flex items-center justify-center gap-2">
+                    <template x-if="!submitting">
+                        <span>{{ __('Create Free Account') }} &rarr;</span>
+                    </template>
+                    <template x-if="submitting">
+                        <span class="flex items-center gap-2">
+                            <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24" aria-hidden="true"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+                            {{ __('Creating account...') }}
+                        </span>
+                    </template>
                 </button>
 
                 <p class="text-xs text-center text-text/40">
@@ -253,7 +272,7 @@
 
         {{-- Login Form --}}
         <div x-show="activeTab === 'login'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100">
-            <form method="POST" action="{{ route('login.store') }}" class="flex flex-col gap-4">
+            <form method="POST" action="{{ route('login.store') }}" x-data="{ submitting: false, showPassword: false }" @submit="if (submitting) { $event.preventDefault(); return; } submitting = true" class="flex flex-col gap-4">
                 @csrf
                 <div>
                     <label for="login-email" class="block text-sm font-medium text-text mb-1.5">{{ __('Email address') }}</label>
@@ -279,15 +298,25 @@
                             </a>
                         @endif
                     </div>
-                    <input
-                        id="login-password"
-                        name="password"
-                        type="password"
-                        required
-                        autocomplete="current-password"
-                        placeholder="Enter your password"
-                        class="w-full rounded-xl border border-gray-200 dark:border-neutral-600 bg-white dark:bg-neutral-800 px-4 py-3 text-sm text-text placeholder-text/30 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors"
-                    >
+                    <div class="relative">
+                        <input
+                            id="login-password"
+                            name="password"
+                            :type="showPassword ? 'text' : 'password'"
+                            required
+                            autocomplete="current-password"
+                            placeholder="Enter your password"
+                            class="w-full rounded-xl border border-gray-200 dark:border-neutral-600 bg-white dark:bg-neutral-800 px-4 py-3 pr-12 text-sm text-text placeholder-text/30 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors"
+                        >
+                        <button type="button" @click="showPassword = !showPassword" :aria-pressed="showPassword" aria-label="{{ __('Toggle password visibility') }}" class="absolute inset-y-0 right-0 flex items-center px-4 text-text/40 hover:text-primary transition-colors cursor-pointer">
+                            <template x-if="!showPassword">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12s3.75-6.75 9.75-6.75S21.75 12 21.75 12 18 18.75 12 18.75 2.25 12 2.25 12z"/><path stroke-linecap="round" stroke-linejoin="round" d="M14.25 12a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z"/></svg>
+                            </template>
+                            <template x-if="showPassword">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M3 3l18 18M10.584 10.587A2.25 2.25 0 0013.5 13.5M9.88 5.275A9.82 9.82 0 0112 5.25c6 0 9.75 6.75 9.75 6.75a18.09 18.09 0 01-3.197 4.044M6.228 6.228A18.13 18.13 0 002.25 12S6 18.75 12 18.75a9.9 9.9 0 003.725-.725"/></svg>
+                            </template>
+                        </button>
+                    </div>
                 </div>
 
                 <div class="flex items-center gap-2">
@@ -295,8 +324,16 @@
                     <label for="remember" class="text-sm text-text/60">{{ __('Remember me') }}</label>
                 </div>
 
-                <button type="submit" class="w-full bg-primary hover:bg-primary/90 text-white font-semibold py-3.5 rounded-full text-sm transition-colors mt-1 cursor-pointer">
-                    {{ __('Sign in') }}
+                <button type="submit" :disabled="submitting" class="w-full bg-primary hover:bg-primary/90 disabled:opacity-60 disabled:cursor-not-allowed text-white font-semibold py-3.5 rounded-full text-sm transition-colors mt-1 cursor-pointer flex items-center justify-center gap-2">
+                    <template x-if="!submitting">
+                        <span>{{ __('Sign in') }}</span>
+                    </template>
+                    <template x-if="submitting">
+                        <span class="flex items-center gap-2">
+                            <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24" aria-hidden="true"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+                            {{ __('Signing in...') }}
+                        </span>
+                    </template>
                 </button>
             </form>
 

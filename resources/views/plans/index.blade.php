@@ -6,7 +6,7 @@
             </a>
             <div>
                 <h2 class="font-semibold text-xl text-text dark:text-text leading-tight">Plans & Pricing</h2>
-                <p class="text-xs text-text/50">Activate instantly with your deposit balance</p>
+                <p class="text-xs text-text/50">You can activate a plan instantly with your deposit balance.</p>
             </div>
         </div>
     </x-slot>
@@ -34,23 +34,60 @@
         ];
     @endphp
 
-    <div class="space-y-5 pb-8">
         {{-- Deposit Balance Card --}}
-        <div class="bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 dark:from-neutral-950 dark:via-neutral-900 dark:to-neutral-950 rounded-2xl p-5 relative overflow-hidden shadow-xl">
-            <div class="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-xl"></div>
-            <div class="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/4 blur-xl"></div>
-            <div class="relative">
-                <p class="text-xs text-white/50 mb-1">Your deposit balance</p>
-                <p class="text-2xl font-bold text-white mb-3" style="font-family: 'DM Serif Display', Georgia, serif;">{{ $balance }}</p>
-                <a href="{{ route('wallet.index') }}" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white/10 hover:bg-white/20 backdrop-blur-sm rounded-lg text-xs font-medium text-white transition-colors border border-white/10">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m6-6H6"/></svg>
-                    Fund wallet
-                </a>
+        <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary via-primary to-secondary p-6 shadow-2xl ring-1 ring-white/10 dark:from-primary/20 dark:via-secondary/20 dark:to-primary/20">
+            {{-- Animated background elements --}}
+            <div class="absolute inset-0">
+                <div class="absolute -top-10 -right-10 h-40 w-40 rounded-full bg-white/10 blur-3xl animate-pulse"></div>
+                <div class="absolute -bottom-8 -left-8 h-32 w-32 rounded-full bg-white/5 blur-2xl animate-pulse" style="animation-delay: 1s;"></div>
+                <div class="absolute top-1/2 left-1/2 h-24 w-24 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white/5 blur-xl"></div>
+            </div>
+            
+            {{-- Grid pattern overlay --}}
+            <div class="absolute inset-0 bg-grid-white/5 [mask-image:linear-gradient(to_bottom,white,transparent)]"></div>
+            
+            <div class="relative flex flex-col gap-4">
+                {{-- Header with icon and label --}}
+                <div class="flex items-start justify-between">
+                    <div>
+                        <div class="flex items-center gap-2 mb-1">
+                            <div class="w-8 h-8 rounded-lg bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m6-6H6"/></svg>
+                            </div>
+                            <p class="text-xs font-medium text-white/80 uppercase tracking-wider">Available Balance</p>
+                        </div>
+                        <h3 class="text-sm text-white/60">Ready to activate a plan</h3>
+                    </div>
+                    
+                    {{-- Status indicator --}}
+                    <div class="flex flex-col items-end gap-1">
+                        <div class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></div>
+                        <p class="text-[10px] text-green-300 font-medium">Active</p>
+                    </div>
+                </div>
+                
+                {{-- Amount display with enhanced styling --}}
+                <div class="text-center py-4">
+                    <div class="relative inline-block">
+                        <p class="text-xs text-white/70 mb-2">Total Balance</p>
+                        <p class="text-4xl font-bold text-white" style="font-family: 'DM Serif Display', Georgia, serif;">
+                            {{ $balance }}
+                        </p>
+                    </div>
+                </div>
+                
+                {{-- Action hint --}}
+                <div class="mt-2">
+                    <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 backdrop-blur-sm border border-white/20">
+                        <svg class="w-3.5 h-3.5 text-white/80" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                        <span class="text-[10px] font-medium text-white/90">Tap to activate any plan</span>
+                    </div>
+                </div>
             </div>
         </div>
 
-        {{-- Subtitle --}}
-        <p class="text-xs text-text/40 text-center">Every plan is a one-time <span class="font-semibold text-text/60">Lifetime</span> activation - pay once, earn forever.</p>
+        {{-- Spacing after balance card --}}
+        <div class="h-8"></div>
 
         {{-- Plan Cards --}}
         @foreach($plans as $plan)

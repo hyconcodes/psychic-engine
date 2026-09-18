@@ -1,9 +1,12 @@
 <?php
 
 use App\Models\User;
+use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Laravel\Fortify\Features;
 use Livewire\Livewire;
+
+uses(LazilyRefreshDatabase::class);
 
 beforeEach(function () {
     $this->skipUnlessFortifyHas(Features::twoFactorAuthentication());

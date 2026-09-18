@@ -191,4 +191,61 @@ class BachsService implements BachsServiceInterface
 
         return false;
     }
+
+    public function listBanks(string $country = 'NG'): array
+    {
+        try {
+            $response = Http::withHeaders([
+                'Authorization' => "Bearer {$this->apiKey}",
+                'Accept' => 'application/json',
+            ])->timeout(30)->get("{$this->baseUrl}/v1/reference/banks", ['country' => $country]);
+
+            if ($response->failed()) {
+                Log::error('Bachs list banks failed', ['status' => $response->status(), 'body' => $response->body()]);
+
+                return [];
+            }
+
+            return $response->json('banks', []);
+        } catch (\Exception $e) {
+            Log::error('Bachs list banks connection failed', ['error' => $e->getMessage()]);
+
+            return [];
+        }
+    }
+
+    public function resolveBankAccount(string $accountNumber, string $bankCode, string $country = 'NG'): array
+    {
+        try {
+            $response = Http::withHeaders([
+                'Authorization' => "Bearer {$this->apiKey}",
+                'Accept' => 'application/json',
+                'Content-Type' => 'application/json',
+            ])->timeout(30)->post("{$this->baseUrl}/v1/misc/bank-accounts/resolve", [
+                'account_number' => $accountNumber,
+                'bank_code' => $bankCode,
+                'country' => $country,
+            ]);
+
+            if ($response->failed()) {
+                Log::error('Bachs bank account resolution failed', [
+                    'status' => $response->status(),
+                    'body' => $response->body(),
+                ]);
+
+                throw BachsException::apiError(
+                    $response->json('detail', 'Could not resolve account'),
+                    $response->status()
+                );
+            }
+
+            return $response->json();
+        } catch (BachsException $e) {
+            throw $e;
+        } catch (\Exception $e) {
+            Log::error('Bachs bank account resolution connection failed', ['error' => $e->getMessage()]);
+
+            throw BachsException::networkError($e);
+        }
+    }
 }

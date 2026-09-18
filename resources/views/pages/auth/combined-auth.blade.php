@@ -50,12 +50,12 @@
                 }"
                 x-show="show"
                 x-transition:enter="transition ease-out duration-300"
-                x-transition:enter-start="opacity-0 -translate-y-4"
+                x-transition:enter-start="opacity-0 translate-y-4"
                 x-transition:enter-end="opacity-100 translate-y-0"
                 x-transition:leave="transition ease-in duration-200"
                 x-transition:leave-start="opacity-100 translate-y-0"
-                x-transition:leave-end="opacity-0 -translate-y-4"
-                class="fixed top-4 left-1/2 -translate-x-1/2 z-[100]"
+                x-transition:leave-end="opacity-0 translate-y-4"
+                class="fixed bottom-4 left-1/2 -translate-x-1/2 z-[100]"
             >
                 <div class="flex items-center gap-3 px-5 py-3 rounded-xl shadow-lg border"
                     :class="{
@@ -98,12 +98,12 @@
                 }"
                 x-show="show"
                 x-transition:enter="transition ease-out duration-300"
-                x-transition:enter-start="opacity-0 -translate-y-4"
+                x-transition:enter-start="opacity-0 translate-y-4"
                 x-transition:enter-end="opacity-100 translate-y-0"
                 x-transition:leave="transition ease-in duration-200"
                 x-transition:leave-start="opacity-100 translate-y-0"
-                x-transition:leave-end="opacity-0 -translate-y-4"
-                class="fixed top-4 left-1/2 -translate-x-1/2 z-[100] max-w-md w-full"
+                x-transition:leave-end="opacity-0 translate-y-4"
+                class="fixed bottom-4 left-1/2 -translate-x-1/2 z-[100] max-w-md w-full"
             >
                 <div class="flex items-start gap-3 px-5 py-3 rounded-xl shadow-lg border bg-red-50 border-red-200 text-red-700 dark:bg-red-900/30 dark:border-red-800 dark:text-red-400">
                     <svg class="w-5 h-5 shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"/></svg>
@@ -130,12 +130,12 @@
         <div
             x-show="showRefToast"
             x-transition:enter="transition ease-out duration-300"
-            x-transition:enter-start="opacity-0 -translate-y-4"
+            x-transition:enter-start="opacity-0 translate-y-4"
             x-transition:enter-end="opacity-100 translate-y-0"
             x-transition:leave="transition ease-in duration-200"
             x-transition:leave-start="opacity-100 translate-y-0"
-            x-transition:leave-end="opacity-0 -translate-y-4"
-            class="fixed top-4 left-1/2 -translate-x-1/2 z-[100]"
+            x-transition:leave-end="opacity-0 translate-y-4"
+            class="fixed bottom-4 left-1/2 -translate-x-1/2 z-[100]"
         >
             <div class="flex items-center gap-3 px-5 py-3 rounded-xl shadow-lg border bg-green-50 border-green-200 text-green-700 dark:bg-green-900/30 dark:border-green-800 dark:text-green-400">
                 <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z"/></svg>

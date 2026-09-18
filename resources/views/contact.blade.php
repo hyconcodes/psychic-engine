@@ -13,7 +13,7 @@
             .font-serif-display { font-family: 'DM Serif Display', Georgia, serif; }
         </style>
     </head>
-    <body class="bg-white text-text font-sans antialiased" x-data="{ sent: false }">
+    <body class="bg-white text-text font-sans antialiased" x-data="{ sent: @js(session('status') === 'sent') }">
 
         {{-- Navigation --}}
         <nav class="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100/80">
@@ -114,7 +114,19 @@
                             </div>
 
                             {{-- Form --}}
-                            <form x-show="!sent" x-transition class="space-y-5" x-data="{ sending: false }" @submit.prevent="sending = true; setTimeout(() => { sent = true; sending = false; }, 1500);">
+                            <form x-show="!sent" x-transition class="space-y-5" method="POST" action="{{ route('contact.store') }}">
+                                @csrf
+
+                                @if ($errors->any())
+                                    <div class="rounded-xl bg-red-50 border border-red-200 text-red-700 px-4 py-3 text-sm">
+                                        <ul class="list-disc list-inside space-y-1">
+                                            @foreach ($errors->all() as $error)
+                                                <li>{{ $error }}</li>
+                                            @endforeach
+                                        </ul>
+                                    </div>
+                                @endif
+
                                 <div class="grid sm:grid-cols-2 gap-5">
                                     <div>
                                         <label for="contact-name" class="block text-sm font-medium text-text mb-1.5">Your name</label>
@@ -123,6 +135,7 @@
                                             name="name"
                                             type="text"
                                             required
+                                            value="{{ old('name') }}"
                                             placeholder="Alex Johnson"
                                             class="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-text placeholder-text/30 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors"
                                         >
@@ -134,6 +147,7 @@
                                             name="email"
                                             type="email"
                                             required
+                                            value="{{ old('email') }}"
                                             placeholder="you@example.com"
                                             class="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-text placeholder-text/30 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors"
                                         >
@@ -147,11 +161,11 @@
                                         name="subject"
                                         class="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-text focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors appearance-none"
                                     >
-                                        <option value="general">General enquiry</option>
-                                        <option value="support">Account support</option>
-                                        <option value="payment">Payment issue</option>
-                                        <option value="partnership">Partnership</option>
-                                        <option value="feedback">Feedback</option>
+                                        <option value="general" {{ old('subject') === 'general' ? 'selected' : '' }}>General enquiry</option>
+                                        <option value="support" {{ old('subject') === 'support' ? 'selected' : '' }}>Account support</option>
+                                        <option value="payment" {{ old('subject') === 'payment' ? 'selected' : '' }}>Payment issue</option>
+                                        <option value="partnership" {{ old('subject') === 'partnership' ? 'selected' : '' }}>Partnership</option>
+                                        <option value="feedback" {{ old('subject') === 'feedback' ? 'selected' : '' }}>Feedback</option>
                                     </select>
                                 </div>
 
@@ -164,22 +178,14 @@
                                         required
                                         placeholder="Tell us how we can help..."
                                         class="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-text placeholder-text/30 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors resize-none"
-                                    ></textarea>
+                                    >{{ old('message') }}</textarea>
                                 </div>
 
-                                <button type="submit" :disabled="sending" class="w-full bg-primary hover:bg-primary/90 disabled:opacity-60 text-white font-semibold py-3.5 rounded-full text-sm transition-colors flex items-center justify-center gap-2 cursor-pointer">
-                                    <template x-if="!sending">
-                                        <span class="flex items-center gap-2">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5"/></svg>
-                                            Send Message
-                                        </span>
-                                    </template>
-                                    <template x-if="sending">
-                                        <span class="flex items-center gap-2">
-                                            <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
-                                            Sending...
-                                        </span>
-                                    </template>
+                                <button type="submit" class="w-full bg-primary hover:bg-primary/90 text-white font-semibold py-3.5 rounded-full text-sm transition-colors flex items-center justify-center gap-2 cursor-pointer">
+                                    <span class="flex items-center gap-2">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5"/></svg>
+                                        Send Message
+                                    </span>
                                 </button>
                             </form>
                         </div>

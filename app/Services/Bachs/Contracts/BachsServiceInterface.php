@@ -17,4 +17,8 @@ interface BachsServiceInterface
     public function createProduct(string $name, string $amount, string $currency = 'NGN', ?string $description = null): string;
 
     public function verifyWebhookSignature(string $rawBody, ?string $timestampHeader, ?string $signatureHeader): bool;
+
+    public function listBanks(string $country = 'NG'): array;
+
+    public function resolveBankAccount(string $accountNumber, string $bankCode, string $country = 'NG'): array;
 }

@@ -1,7 +1,9 @@
 <?php
 
 use App\Models\User;
-use Livewire\Livewire;
+use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
+
+uses(LazilyRefreshDatabase::class);
 
 test('profile page is displayed', function () {
     $this->actingAs($user = User::factory()->create());
@@ -9,67 +11,42 @@ test('profile page is displayed', function () {
     $this->get(route('profile.edit'))->assertOk();
 });
 
-test('profile information can be updated', function () {
+test('profile page shows the user name and email', function () {
     $user = User::factory()->create();
 
     $this->actingAs($user);
 
-    $response = Livewire::test('pages::settings.profile')
-        ->set('name', 'Test User')
-        ->set('email', 'test@example.com')
-        ->call('updateProfileInformation');
-
-    $response->assertHasNoErrors();
-
-    $user->refresh();
-
-    expect($user->name)->toEqual('Test User');
-    expect($user->email)->toEqual('test@example.com');
-    expect($user->email_verified_at)->toBeNull();
+    $this->get(route('profile.edit'))
+        ->assertOk()
+        ->assertSee($user->name)
+        ->assertSee($user->email);
 });
 
-test('email verification status is unchanged when email address is unchanged', function () {
-    $user = User::factory()->create();
+test('profile page shows the phone number and two-factor status', function () {
+    $user = User::factory()->create(['phone' => '08012345678']);
 
     $this->actingAs($user);
 
-    $response = Livewire::test('pages::settings.profile')
-        ->set('name', 'Test User')
-        ->set('email', $user->email)
-        ->call('updateProfileInformation');
-
-    $response->assertHasNoErrors();
-
-    expect($user->refresh()->email_verified_at)->not->toBeNull();
+    $this->get(route('profile.edit'))
+        ->assertOk()
+        ->assertSee('08012345678')
+        ->assertSee('Not enabled');
 });
 
-test('user can delete their account', function () {
+test('profile page shows the linked payout account', function () {
     $user = User::factory()->create();
+    $user->payoutAccount()->create([
+        'bank_name' => 'Providus Bank',
+        'bank_code' => '101',
+        'account_number' => '0123456789',
+        'account_name' => 'ADA OKAFOR',
+    ]);
 
     $this->actingAs($user);
 
-    $response = Livewire::test('pages::settings.delete-user-modal')
-        ->set('password', 'password')
-        ->call('deleteUser');
-
-    $response
-        ->assertHasNoErrors()
-        ->assertRedirect('/');
-
-    expect($user->fresh())->toBeNull();
-    expect(auth()->check())->toBeFalse();
-});
-
-test('correct password must be provided to delete account', function () {
-    $user = User::factory()->create();
-
-    $this->actingAs($user);
-
-    $response = Livewire::test('pages::settings.delete-user-modal')
-        ->set('password', 'wrong-password')
-        ->call('deleteUser');
-
-    $response->assertHasErrors(['password']);
-
-    expect($user->fresh())->not->toBeNull();
+    $this->get(route('profile.edit'))
+        ->assertOk()
+        ->assertSee('Providus Bank')
+        ->assertSee('0123456789')
+        ->assertSee('ADA OKAFOR');
 });

@@ -2,8 +2,11 @@
 
 use App\Models\User;
 use Illuminate\Auth\Notifications\ResetPassword;
+use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Facades\Notification;
 use Laravel\Fortify\Features;
+
+uses(LazilyRefreshDatabase::class);
 
 beforeEach(function () {
     $this->skipUnlessFortifyHas(Features::resetPasswords());

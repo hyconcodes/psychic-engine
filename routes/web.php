@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ContactController;
 use App\Http\Controllers\PlanController;
 use App\Http\Controllers\TransactionController;
 use Illuminate\Support\Facades\Route;
@@ -9,6 +10,7 @@ Route::view('/', 'welcome')->name('home');
 Route::view('terms', 'terms')->name('terms');
 Route::view('privacy', 'privacy')->name('privacy');
 Route::view('contact', 'contact')->name('contact');
+Route::post('contact', [ContactController::class, 'store'])->name('contact.store');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::view('dashboard', 'dashboard')->name('dashboard');

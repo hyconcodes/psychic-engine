@@ -1,7 +1,10 @@
 <?php
 
 use App\Models\User;
+use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Laravel\Fortify\Features;
+
+uses(LazilyRefreshDatabase::class);
 
 test('login screen can be rendered', function () {
     $response = $this->get(route('login'));

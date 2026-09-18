@@ -77,6 +77,11 @@ class User extends Authenticatable implements PasskeyUser
         return $this->hasOne(Wallet::class);
     }
 
+    public function payoutAccount(): HasOne
+    {
+        return $this->hasOne(PayoutAccount::class);
+    }
+
     public function transactions(): HasMany
     {
         return $this->hasMany(Transaction::class);

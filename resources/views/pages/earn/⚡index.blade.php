@@ -91,9 +91,15 @@ new #[Title('Earn')] class extends Component {
                     <div class="h-full bg-gradient-to-r from-primary to-secondary rounded-full" style="width: {{ $voicePct }}%"></div>
                 </div>
 
-                <a href="{{ route('earn.voice') }}" wire:navigate class="w-full py-2.5 rounded-xl font-semibold text-sm transition-all flex items-center justify-center gap-2 {{ $voice['remaining'] > 0 ? 'bg-gradient-to-r from-primary to-secondary text-white shadow-md shadow-primary/20 hover:from-primary/90 hover:to-secondary/90' : 'bg-gray-100 dark:bg-neutral-800 text-text/40 cursor-not-allowed' }}">
-                    {{ $voice['remaining'] > 0 ? __('Start earning') : __('Done for today') }}
-                </a>
+                @if ($voice['remaining'] > 0)
+                    <a href="{{ route('earn.voice') }}" wire:navigate class="w-full py-2.5 rounded-xl font-semibold text-sm transition-all flex items-center justify-center gap-2 bg-gradient-to-r from-primary to-secondary text-white shadow-md shadow-primary/20 hover:from-primary/90 hover:to-secondary/90">
+                        {{ __('Start earning') }}
+                    </a>
+                @else
+                    <button type="button" disabled class="w-full py-2.5 rounded-xl font-semibold text-sm transition-all flex items-center justify-center gap-2 bg-gray-100 dark:bg-neutral-800 text-text/40 cursor-not-allowed">
+                        {{ __('Done for today') }}
+                    </button>
+                @endif
             </div>
 
             {{-- Word Game --}}
@@ -120,9 +126,15 @@ new #[Title('Earn')] class extends Component {
                     <div class="h-full bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full" style="width: {{ $wordPct }}%"></div>
                 </div>
 
-                <a href="{{ route('earn.word-game') }}" wire:navigate class="w-full py-2.5 rounded-xl font-semibold text-sm transition-all flex items-center justify-center gap-2 {{ $word['remaining'] > 0 ? 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white shadow-md shadow-blue-500/20 hover:from-blue-600 hover:to-cyan-600' : 'bg-gray-100 dark:bg-neutral-800 text-text/40 cursor-not-allowed' }}">
-                    {{ $word['remaining'] > 0 ? __('Start earning') : __('Done for today') }}
-                </a>
+                @if ($word['remaining'] > 0)
+                    <a href="{{ route('earn.word-game') }}" wire:navigate class="w-full py-2.5 rounded-xl font-semibold text-sm transition-all flex items-center justify-center gap-2 bg-gradient-to-r from-blue-500 to-cyan-500 text-white shadow-md shadow-blue-500/20 hover:from-blue-600 hover:to-cyan-600">
+                        {{ __('Start earning') }}
+                    </a>
+                @else
+                    <button type="button" disabled class="w-full py-2.5 rounded-xl font-semibold text-sm transition-all flex items-center justify-center gap-2 bg-gray-100 dark:bg-neutral-800 text-text/40 cursor-not-allowed">
+                        {{ __('Done for today') }}
+                    </button>
+                @endif
             </div>
         </div>
     @endif

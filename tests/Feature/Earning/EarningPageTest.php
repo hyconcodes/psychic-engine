@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\EarningPrompt;
+use App\Models\EarningSubmission;
 use App\Models\Plan;
 use App\Models\User;
 use App\Models\UserSubscription;
@@ -86,4 +87,49 @@ test('shows an activation prompt when the user has no plan', function () {
     $this->get(route('earn.index'))
         ->assertOk()
         ->assertSee('Activate a plan to start earning');
+});
+
+test('voice earn page blocks access when the daily limit is reached', function () {
+    $user = planUser();
+
+    for ($i = 0; $i < 5; $i++) {
+        EarningSubmission::create([
+            'user_id' => $user->id,
+            'prompt_id' => 1,
+            'type' => 'sentence',
+            'language' => 'yo',
+            'audio_path' => "earnings/1/{$i}.webm",
+            'amount' => 100,
+            'status' => 'completed',
+        ]);
+    }
+
+    $this->actingAs($user);
+
+    $this->get(route('earn.voice'))
+        ->assertOk()
+        ->assertSee('All done for today!')
+        ->assertDontSee('Select your language');
+});
+
+test('earn hub shows done for today when all tasks are completed', function () {
+    $user = planUser();
+
+    for ($i = 0; $i < 5; $i++) {
+        EarningSubmission::create([
+            'user_id' => $user->id,
+            'prompt_id' => 1,
+            'type' => 'sentence',
+            'language' => 'yo',
+            'audio_path' => "earnings/1/{$i}.webm",
+            'amount' => 100,
+            'status' => 'completed',
+        ]);
+    }
+
+    $this->actingAs($user);
+
+    $this->get(route('earn.index'))
+        ->assertOk()
+        ->assertSee('Done for today');
 });

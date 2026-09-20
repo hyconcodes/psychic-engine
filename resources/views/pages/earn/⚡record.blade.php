@@ -32,10 +32,35 @@ new #[Title('Earn')] class extends Component {
 
     public string $earnedAmount = '';
 
+    public bool $limitReached = false;
+
     public function mount(?string $type = null): void
     {
         $this->type = $type ?? 'sentence';
         $this->languages = config('earning.languages', []);
+        $this->refreshLimit();
+    }
+
+    public function refreshLimit(): void
+    {
+        $plan = Auth::user()->currentPlan();
+
+        if (! $plan) {
+            $this->limitReached = false;
+
+            return;
+        }
+
+        $limit = $this->type === 'sentence'
+            ? (int) $plan->daily_voice_tasks
+            : (int) $plan->daily_word_tasks;
+
+        $done = EarningSubmission::where('user_id', Auth::id())
+            ->where('type', $this->type)
+            ->where('created_at', '>=', now()->startOfDay())
+            ->count();
+
+        $this->limitReached = $done >= $limit;
     }
 
     public function selectLanguage(): void
@@ -110,7 +135,11 @@ new #[Title('Earn')] class extends Component {
         $this->celebrating = false;
         $this->earnedAmount = '';
         $this->resetRecording();
-        $this->loadPrompt();
+        $this->refreshLimit();
+
+        if (! $this->limitReached) {
+            $this->loadPrompt();
+        }
     }
 
     public function resetRecording(): void
@@ -161,6 +190,17 @@ new #[Title('Earn')] class extends Component {
             </div>
             <svg class="w-5 h-5 text-text/30 group-hover:text-primary transition-colors shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg>
         </a>
+    @elseif ($limitReached)
+        <div class="bg-white dark:bg-neutral-900 rounded-2xl border border-gray-100 dark:border-neutral-800 p-10 text-center shadow-sm">
+            <div class="w-16 h-16 bg-green-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg class="w-8 h-8 text-green-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            </div>
+            <h3 class="text-xl font-bold text-text mb-1" style="font-family: 'DM Serif Display', Georgia, serif;">{{ __('All done for today!') }}</h3>
+            <p class="text-sm text-text/50 mb-6">{{ __('You have completed all your :type tasks for today. Come back tomorrow for more.', ['type' => $this->title()]) }}</p>
+            <a href="{{ route('earn.index') }}" wire:navigate class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-primary to-secondary text-white font-semibold text-sm transition-all shadow-md shadow-primary/20 cursor-pointer">
+                {{ __('Back to Earn') }}
+            </a>
+        </div>
     @else
         {{-- Language selector --}}
         <div>
@@ -204,6 +244,7 @@ new #[Title('Earn')] class extends Component {
                                 x-data="{
                                     recording: false,
                                     recorded: false,
+                                    uploading: false,
                                     seconds: 0,
                                     activeWord: 0,
                                     timer: null,
@@ -231,7 +272,8 @@ new #[Title('Earn')] class extends Component {
                                             const blob = new Blob(this.chunks, { type: mime });
                                             const file = new File([blob], 'recording.' + ext, { type: mime });
                                             this.$wire.set('duration', Math.round(this.seconds));
-                                            this.$wire.upload('audio', file, () => { this.recorded = true; }, () => { alert('Upload failed. Please try again.'); });
+                                            this.uploading = true;
+                                            this.$wire.upload('audio', file, () => { this.recorded = true; this.uploading = false; }, () => { this.uploading = false; alert('Upload failed. Please try again.'); });
                                             this.stopTimer();
                                         };
                                         this.recorder.start();
@@ -278,6 +320,7 @@ new #[Title('Earn')] class extends Component {
 
                                     resetAudio() {
                                         this.recorded = false;
+                                        this.uploading = false;
                                         this.seconds = 0;
                                         this.activeWord = 0;
                                         this.chunks = [];
@@ -315,9 +358,15 @@ new #[Title('Earn')] class extends Component {
                                         </template>
                                     </button>
 
-                                    <p class="text-sm font-medium text-text/60" x-text="recording ? 'Recording… ' + formatTime(seconds) : (recorded ? 'Recording ready' : 'Tap to record')"></p>
+                                    <p class="text-sm font-medium text-text/60" x-text="recording ? 'Recording… ' + formatTime(seconds) : (uploading ? 'Uploading…' : (recorded ? 'Recording ready' : 'Tap to record'))"></p>
 
-                                    <template x-if="!recording && recorded">
+                                    <template x-if="uploading">
+                                        <div class="flex justify-center py-2">
+                                            <x-spinner class="w-10 h-10" />
+                                        </div>
+                                    </template>
+
+                                    <template x-if="!recording && recorded && !uploading">
                                         <div class="flex items-center gap-2">
                                             <button type="button" @click="replayPreview()" class="px-4 py-2 rounded-xl border border-gray-200 dark:border-neutral-700 text-sm font-medium text-text/70 hover:bg-gray-50 dark:hover:bg-neutral-800 transition-colors cursor-pointer">
                                                 {{ __('Replay') }}
@@ -363,8 +412,8 @@ new #[Title('Earn')] class extends Component {
 
     {{-- Congratulations overlay --}}
     @if ($celebrating)
-        <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
-            <div class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+        <div x-data="{ show: true }" x-show="show" class="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" @click="show = false; $wire.continue()"></div>
 
             <div class="relative bg-white dark:bg-neutral-900 rounded-3xl p-8 text-center shadow-2xl max-w-sm w-full overflow-visible">
                 {{-- Confetti dots --}}
@@ -389,7 +438,7 @@ new #[Title('Earn')] class extends Component {
 
                 <button
                     type="button"
-                    wire:click="continue"
+                    @click="show = false; $wire.continue()"
                     class="w-full py-3.5 rounded-xl bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 text-white font-semibold text-sm transition-all shadow-lg shadow-primary/20 cursor-pointer"
                 >
                     {{ __('Continue earning') }}

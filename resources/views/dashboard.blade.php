@@ -4,6 +4,7 @@
         $currentPlan = $user->currentPlan();
         $wallet = $user->wallet;
         $balance = $wallet ? $wallet->formattedBalance() : '₦0.00';
+        $tasksCompleted = $user->earningSubmissions()->count();
     @endphp
     <div class="space-y-6">
 
@@ -51,6 +52,18 @@
                 <svg class="w-5 h-5 text-text/50" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0"/></svg>
                 <span class="absolute -top-0.5 -right-0.5 w-3 h-3 bg-primary rounded-full border-2 border-white dark:border-neutral-900"></span>
             </button>
+        </div>
+
+        {{-- Review Warning Marquee --}}
+        <div class="overflow-hidden rounded-xl bg-amber-50 dark:bg-amber-900/15 border border-amber-200 dark:border-amber-800/30 py-1.5">
+            <div class="flex whitespace-nowrap animate-marquee">
+                @foreach ([1, 2] as $copy)
+                    <div class="flex items-center gap-2 px-8">
+                        <svg class="w-3.5 h-3.5 text-amber-500 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg>
+                        <span class="text-[11px] font-medium text-amber-700 dark:text-amber-400">{{ __('All tasks are reviewed by the admin before being credited to your linked payout account. Nonsense or low-quality submissions may reduce your earnings or cause temporary account suspension.') }}</span>
+                    </div>
+                @endforeach
+            </div>
         </div>
 
         {{-- Balance Card — ATM Style --}}
@@ -159,7 +172,7 @@
                     <div class="w-8 h-8 bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-900/10 rounded-lg flex items-center justify-center mb-3">
                         <svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                     </div>
-                    <p class="text-2xl font-bold text-text" style="font-family: 'DM Serif Display', Georgia, serif;">0</p>
+                    <p class="text-2xl font-bold text-text" style="font-family: 'DM Serif Display', Georgia, serif;">{{ $tasksCompleted }}</p>
                     <p class="text-[11px] text-text/40 mt-0.5">Tasks completed</p>
                 </div>
                 <div class="bg-white dark:bg-neutral-900 rounded-xl border border-gray-100 dark:border-neutral-800 p-4 shadow-sm hover:shadow-md transition-shadow">

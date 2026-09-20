@@ -87,6 +87,11 @@ class User extends Authenticatable implements PasskeyUser
         return $this->hasMany(Transaction::class);
     }
 
+    public function earningSubmissions(): HasMany
+    {
+        return $this->hasMany(EarningSubmission::class);
+    }
+
     public function hasActivePlan(): bool
     {
         return $this->activeSubscription()->exists();

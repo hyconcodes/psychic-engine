@@ -21,6 +21,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('plans/cancelled', [PlanController::class, 'cancelled'])->name('plans.cancelled');
 
     Route::get('transactions', [TransactionController::class, 'index'])->name('transactions.index');
+
+    Route::livewire('earn', 'pages::earn.index')->name('earn.index');
+    Route::livewire('earn/voice', 'pages::earn.record')->name('earn.voice')->defaults('type', 'sentence');
+    Route::livewire('earn/word-game', 'pages::earn.record')->name('earn.word-game')->defaults('type', 'word');
 });
 
 require __DIR__.'/settings.php';

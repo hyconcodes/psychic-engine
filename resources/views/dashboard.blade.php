@@ -112,13 +112,13 @@
         <div>
             <p class="text-xs text-text/35 text-center mb-3">Ways to earn</p>
             <div class="grid grid-cols-3 gap-3">
-                <a href="#" class="flex flex-col items-center gap-2 p-3 bg-white dark:bg-neutral-900 rounded-xl border border-gray-100 dark:border-neutral-800 hover:border-primary/30 hover:shadow-md transition-all group">
+                <a href="{{ route('earn.index') }}" wire:navigate class="flex flex-col items-center gap-2 p-3 bg-white dark:bg-neutral-900 rounded-xl border border-gray-100 dark:border-neutral-800 hover:border-primary/30 hover:shadow-md transition-all group">
                     <div class="w-10 h-10 bg-gradient-to-br from-primary/10 to-primary/5 rounded-full flex items-center justify-center group-hover:from-primary/20 group-hover:to-primary/10 transition-colors">
                         <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 18.75a6 6 0 006-6v-1.5m-6 7.5a6 6 0 01-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 01-3-3V4.5a3 3 0 116 0v8.25a3 3 0 01-3 3z"/></svg>
                     </div>
                     <span class="text-[11px] font-medium text-text/60 text-center">Voice Earn</span>
                 </a>
-                <a href="#" class="flex flex-col items-center gap-2 p-3 bg-white dark:bg-neutral-900 rounded-xl border border-gray-100 dark:border-neutral-800 hover:border-blue-300 hover:shadow-md transition-all group">
+                <a href="{{ route('earn.index') }}" wire:navigate class="flex flex-col items-center gap-2 p-3 bg-white dark:bg-neutral-900 rounded-xl border border-gray-100 dark:border-neutral-800 hover:border-blue-300 hover:shadow-md transition-all group">
                     <div class="w-10 h-10 bg-gradient-to-br from-blue-50 to-blue-100/50 dark:from-blue-900/20 dark:to-blue-900/10 rounded-full flex items-center justify-center group-hover:from-blue-100 group-hover:to-blue-50 transition-colors">
                         <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25"/></svg>
                     </div>
@@ -297,21 +297,21 @@
                 @endif
             </div>
             <div class="grid grid-cols-2 gap-3">
-                <a href="#" class="bg-white dark:bg-neutral-900 rounded-xl border border-gray-100 dark:border-neutral-800 p-5 text-center hover:border-primary/30 hover:shadow-md transition-all">
+                <a href="{{ route('earn.index') }}" wire:navigate class="bg-white dark:bg-neutral-900 rounded-xl border border-gray-100 dark:border-neutral-800 p-5 text-center hover:border-primary/30 hover:shadow-md transition-all">
                     <div class="w-10 h-10 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-full flex items-center justify-center mx-auto mb-3">
                         <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 18.75a6 6 0 006-6v-1.5m-6 7.5a6 6 0 01-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 01-3-3V4.5a3 3 0 116 0v8.25a3 3 0 01-3 3z"/></svg>
                     </div>
                     <p class="text-sm font-semibold text-text mb-0.5">Voice Earn</p>
-                    <p class="text-xs text-primary font-medium">+&#8358;0.00/session</p>
-                    <p class="text-[10px] text-text/30 mt-1">{{ $currentPlan ? 'Start earning' : 'Activate plan' }}</p>
+                    <p class="text-xs text-primary font-medium">{{ $currentPlan ? '+&#8358;'.number_format((float) $currentPlan->voice_earn_per_session).'/session' : 'Activate plan' }}</p>
+                    <p class="text-[10px] text-text/30 mt-1">{{ $currentPlan ? 'Start earning' : 'Unlock with a plan' }}</p>
                 </a>
-                <a href="#" class="bg-white dark:bg-neutral-900 rounded-xl border border-gray-100 dark:border-neutral-800 p-5 text-center hover:border-blue-300 hover:shadow-md transition-all">
+                <a href="{{ route('earn.index') }}" wire:navigate class="bg-white dark:bg-neutral-900 rounded-xl border border-gray-100 dark:border-neutral-800 p-5 text-center hover:border-blue-300 hover:shadow-md transition-all">
                     <div class="w-10 h-10 bg-gradient-to-br from-blue-50 to-blue-100/50 dark:from-blue-900/20 dark:to-blue-900/10 rounded-full flex items-center justify-center mx-auto mb-3">
                         <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25"/></svg>
                     </div>
                     <p class="text-sm font-semibold text-text mb-0.5">Word Game</p>
-                    <p class="text-xs text-primary font-medium">+&#8358;0.00/word</p>
-                    <p class="text-[10px] text-text/30 mt-1">{{ $currentPlan ? 'Start earning' : 'Activate plan' }}</p>
+                    <p class="text-xs text-primary font-medium">{{ $currentPlan ? '+&#8358;'.number_format((float) $currentPlan->word_game_per_word).'/word' : 'Activate plan' }}</p>
+                    <p class="text-[10px] text-text/30 mt-1">{{ $currentPlan ? 'Start earning' : 'Unlock with a plan' }}</p>
                 </a>
             </div>
         </div>

@@ -14,6 +14,8 @@ class Plan extends Model
         'price',
         'voice_earn_per_session',
         'word_game_per_word',
+        'daily_voice_tasks',
+        'daily_word_tasks',
         'features',
         'is_popular',
         'is_active',
@@ -22,6 +24,8 @@ class Plan extends Model
 
     protected $casts = [
         'price' => 'decimal:2',
+        'daily_voice_tasks' => 'integer',
+        'daily_word_tasks' => 'integer',
         'features' => 'array',
         'is_popular' => 'boolean',
         'is_active' => 'boolean',

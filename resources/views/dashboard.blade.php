@@ -4,7 +4,12 @@
         $currentPlan = $user->currentPlan();
         $wallet = $user->wallet;
         $balance = $wallet ? $wallet->formattedBalance() : '₦0.00';
-        $tasksCompleted = $user->earningSubmissions()->count();
+        $tasksCompletedToday = $user->earningSubmissions()
+            ->where('created_at', '>=', now()->startOfDay())
+            ->count();
+        $dailyTasksTotal = $currentPlan
+            ? ((int) $currentPlan->daily_voice_tasks + (int) $currentPlan->daily_word_tasks)
+            : 0;
     @endphp
     <div class="space-y-6">
 
@@ -109,7 +114,7 @@
                 </div>
 
                 <div class="grid grid-cols-2 gap-2">
-                    <a href="#" class="flex items-center justify-center gap-1.5 py-3 rounded-xl bg-white/10 hover:bg-white/20 backdrop-blur-md text-sm font-semibold text-white transition-all cursor-pointer border border-white/20">
+                    <a href="{{ route('withdraw.index') }}" wire:navigate class="flex items-center justify-center gap-1.5 py-3 rounded-xl bg-white/10 hover:bg-white/20 backdrop-blur-md text-sm font-semibold text-white transition-all cursor-pointer border border-white/20">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg>
                         Withdraw
                     </a>
@@ -172,7 +177,7 @@
                     <div class="w-8 h-8 bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-900/10 rounded-lg flex items-center justify-center mb-3">
                         <svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                     </div>
-                    <p class="text-2xl font-bold text-text" style="font-family: 'DM Serif Display', Georgia, serif;">{{ $tasksCompleted }}</p>
+                    <p class="text-2xl font-bold text-text" style="font-family: 'DM Serif Display', Georgia, serif;">{{ $tasksCompletedToday }}/{{ $dailyTasksTotal }}</p>
                     <p class="text-[11px] text-text/40 mt-0.5">Tasks completed</p>
                 </div>
                 <div class="bg-white dark:bg-neutral-900 rounded-xl border border-gray-100 dark:border-neutral-800 p-4 shadow-sm hover:shadow-md transition-shadow">

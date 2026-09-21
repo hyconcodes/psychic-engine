@@ -248,4 +248,75 @@ class BachsService implements BachsServiceInterface
             throw BachsException::networkError($e);
         }
     }
+
+    public function createPayoutDestination(string $name, string $currency, string $accountNumber, string $bankCode): string
+    {
+        try {
+            $response = Http::withHeaders([
+                'Authorization' => "Bearer {$this->apiKey}",
+                'Accept' => 'application/json',
+                'Content-Type' => 'application/json',
+            ])->timeout(30)->post("{$this->baseUrl}/v1/payouts/destinations", [
+                'name' => $name,
+                'currency' => $currency,
+                'account_number' => $accountNumber,
+                'bank_code' => $bankCode,
+            ]);
+
+            if ($response->failed()) {
+                Log::error('Bachs payout destination creation failed', [
+                    'status' => $response->status(),
+                    'body' => $response->body(),
+                ]);
+
+                throw BachsException::apiError(
+                    $response->json('detail', 'Payout destination creation failed'),
+                    $response->status()
+                );
+            }
+
+            return $response->json('id');
+        } catch (BachsException $e) {
+            throw $e;
+        } catch (\Exception $e) {
+            Log::error('Bachs payout destination connection failed', ['error' => $e->getMessage()]);
+
+            throw BachsException::networkError($e);
+        }
+    }
+
+    public function createPayout(string $destination, string $amount, string $reference): array
+    {
+        try {
+            $response = Http::withHeaders([
+                'Authorization' => "Bearer {$this->apiKey}",
+                'Accept' => 'application/json',
+                'Content-Type' => 'application/json',
+            ])->timeout(30)->post("{$this->baseUrl}/v1/payouts", [
+                'destination' => $destination,
+                'amount' => $amount,
+                'reference' => $reference,
+            ]);
+
+            if ($response->failed()) {
+                Log::error('Bachs payout creation failed', [
+                    'status' => $response->status(),
+                    'body' => $response->body(),
+                ]);
+
+                throw BachsException::apiError(
+                    $response->json('detail', 'Payout creation failed'),
+                    $response->status()
+                );
+            }
+
+            return $response->json();
+        } catch (BachsException $e) {
+            throw $e;
+        } catch (\Exception $e) {
+            Log::error('Bachs payout connection failed', ['error' => $e->getMessage()]);
+
+            throw BachsException::networkError($e);
+        }
+    }
 }

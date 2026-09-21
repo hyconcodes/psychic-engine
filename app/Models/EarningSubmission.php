@@ -10,6 +10,7 @@ class EarningSubmission extends Model
     protected $fillable = [
         'user_id',
         'prompt_id',
+        'withdrawal_request_id',
         'type',
         'language',
         'audio_path',
@@ -33,5 +34,10 @@ class EarningSubmission extends Model
     public function prompt(): BelongsTo
     {
         return $this->belongsTo(EarningPrompt::class, 'prompt_id');
+    }
+
+    public function withdrawalRequest(): BelongsTo
+    {
+        return $this->belongsTo(WithdrawalRequest::class);
     }
 }

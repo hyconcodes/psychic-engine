@@ -13,6 +13,7 @@ class PayoutAccount extends Model
         'bank_code',
         'account_number',
         'account_name',
+        'bachs_destination_id',
     ];
 
     public function user(): BelongsTo

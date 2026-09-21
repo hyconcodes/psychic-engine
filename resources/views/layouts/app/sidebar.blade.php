@@ -33,7 +33,7 @@
 
                 <div class="!mt-5 !mb-2 px-3 text-[10px] font-semibold text-text/30 uppercase tracking-widest">Wallet</div>
 
-                <a href="{{ route('dashboard') }}#withdraw" class="sidebar-nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all text-text/60 hover:text-text hover:bg-gray-100 dark:hover:bg-white/5" wire:navigate>
+                <a href="{{ route('withdraw.index') }}" class="sidebar-nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all {{ request()->routeIs('withdraw.*') ? 'active' : 'text-text/60 hover:text-text hover:bg-gray-100 dark:hover:bg-white/5' }}" wire:navigate>
                     <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg>
                     Withdraw
                 </a>
@@ -64,12 +64,25 @@
                     Settings
                 </a>
 
-                @if(auth()->check() && auth()->user()->email === 'admin@vocalpay.co')
+                @if(auth()->check() && auth()->user()->isAdmin())
                     <div class="!mt-5 !mb-2 px-3 text-[10px] font-semibold text-text/30 uppercase tracking-widest">Admin</div>
-                    <a href="{{ route('admin.plans.index') }}" class="sidebar-nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all {{ request()->routeIs('admin.*') ? 'active' : 'text-text/60 hover:text-text hover:bg-gray-100 dark:hover:bg-white/5' }}" wire:navigate>
-                        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.34 15.84c-.688-.06-1.386-.09-2.09-.09H7.5a4.5 4.5 0 110-9h.75c.704 0 1.402-.03 2.09-.09m0 9.18c.253.962.584 1.892.985 2.783.247.55.06 1.21-.463 1.511l-.657.38c-.551.318-1.26.117-1.527-.461a20.845 20.845 0 01-1.44-4.282m3.102.069a18.03 18.03 0 01-.59-4.59c0-1.586.205-3.124.59-4.59m0 9.18a23.848 23.848 0 018.835 2.535M10.34 6.66a23.847 23.847 0 008.835-2.535m0 0A23.74 23.74 0 0018.795 3m.38 1.125a23.91 23.91 0 011.014 5.395m-1.014 8.855c-.118.38-.245.754-.38 1.125m.38-1.125a23.91 23.91 0 001.014-5.395m0-3.46c.495.413.811 1.035.811 1.73 0 .695-.316 1.317-.811 1.73m0-3.46a24.347 24.347 0 010 3.46"/></svg>
-                        Plan Management
-                    </a>
+                    <div x-data="{ adminOpen: false }">
+                        <button @click="adminOpen = !adminOpen" class="sidebar-nav-item flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-sm font-medium transition-all {{ request()->routeIs('admin.*') ? 'active' : 'text-text/60 hover:text-text hover:bg-gray-100 dark:hover:bg-white/5' }}">
+                            <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.34 15.84c-.688-.06-1.386-.09-2.09-.09H7.5a4.5 4.5 0 110-9h.75c.704 0 1.402-.03 2.09-.09m0 9.18c.253.962.584 1.892.985 2.783.247.55.06 1.21-.463 1.511l-.657.38c-.551.318-1.26.117-1.527-.461a20.845 20.845 0 01-1.44-4.282m3.102.069a18.03 18.03 0 01-.59-4.59c0-1.586.205-3.124.59-4.59m0 9.18a23.848 23.848 0 018.835 2.535M10.34 6.66a23.847 23.847 0 008.835-2.535m0 0A23.74 23.74 0 0018.795 3m.38 1.125a23.91 23.91 0 011.014 5.395m-1.014 8.855c-.118.38-.245.754-.38 1.125m.38-1.125a23.91 23.91 0 001.014-5.395m0-3.46c.495.413.811 1.035.811 1.73 0 .695-.316 1.317-.811 1.73m0-3.46a24.347 24.347 0 010 3.46"/></svg>
+                            <span class="flex-1 text-left">Admin</span>
+                            <svg class="w-4 h-4 shrink-0 transition-transform duration-200" :class="adminOpen && 'rotate-180'" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg>
+                        </button>
+                        <div x-show="adminOpen" x-cloak class="mt-1 space-y-1 pl-4">
+                            <a href="{{ route('admin.plans.index') }}" wire:navigate class="flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium transition-all {{ request()->routeIs('admin.plans.*') ? 'text-primary' : 'text-text/50 hover:text-text hover:bg-gray-100 dark:hover:bg-white/5' }}">
+                                <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z"/></svg>
+                                {{ __('Plan Management') }}
+                            </a>
+                            <a href="{{ route('admin.withdrawals.index') }}" wire:navigate class="flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium transition-all {{ request()->routeIs('admin.withdrawals.*') ? 'text-primary' : 'text-text/50 hover:text-text hover:bg-gray-100 dark:hover:bg-white/5' }}">
+                                <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg>
+                                {{ __('Withdrawal Review') }}
+                            </a>
+                        </div>
+                    </div>
                 @endif
 
                 {{-- Community Links --}}
@@ -190,10 +203,13 @@
                     </flux:sidebar.item>
                 </flux:sidebar.group>
 
-                @if(auth()->check() && auth()->user()->email === 'admin@vocalpay.co')
+                @if(auth()->check() && auth()->user()->isAdmin())
                     <flux:sidebar.group :heading="__('Admin')">
                         <flux:sidebar.item icon="cog-6-tooth" :href="route('admin.plans.index')" wire:navigate>
                             {{ __('Plan Management') }}
+                        </flux:sidebar.item>
+                        <flux:sidebar.item icon="banknotes" :href="route('admin.withdrawals.index')" wire:navigate>
+                            {{ __('Withdrawal Review') }}
                         </flux:sidebar.item>
                     </flux:sidebar.group>
                 @endif

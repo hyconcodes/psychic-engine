@@ -21,4 +21,8 @@ interface BachsServiceInterface
     public function listBanks(string $country = 'NG'): array;
 
     public function resolveBankAccount(string $accountNumber, string $bankCode, string $country = 'NG'): array;
+
+    public function createPayoutDestination(string $name, string $currency, string $accountNumber, string $bankCode): string;
+
+    public function createPayout(string $destination, string $amount, string $reference): array;
 }

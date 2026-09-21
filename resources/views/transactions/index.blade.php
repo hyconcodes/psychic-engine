@@ -29,6 +29,8 @@
             'earning' => 'Earning',
             'withdrawal' => 'Withdrawal',
         ];
+
+        $declineReasons = \App\Models\WithdrawalRequest::DECLINE_REASONS;
     @endphp
 
     <div class="space-y-5 pb-8">
@@ -57,35 +59,108 @@
                         $statusStyle = $statusColors[$transaction->status] ?? $statusColors['pending'];
                         $planName = $transaction->metadata['plan_name'] ?? null;
                     @endphp
-                    <div class="bg-white dark:bg-neutral-900 rounded-xl border border-gray-100 dark:border-neutral-800 p-4 shadow-sm flex items-center gap-3">
-                        {{-- Type Icon --}}
-                        <div class="w-10 h-10 {{ $typeStyle['bg'] }} rounded-xl flex items-center justify-center shrink-0">
-                            <svg class="w-5 h-5 {{ $typeStyle['text'] }}" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">{!! $typeStyle['icon'] !!}</svg>
+                    <div x-data="{ open: false }" class="bg-white dark:bg-neutral-900 rounded-xl border border-gray-100 dark:border-neutral-800 shadow-sm overflow-hidden">
+                        <div class="p-4 flex items-center gap-3">
+                            {{-- Type Icon --}}
+                            <div class="w-10 h-10 {{ $typeStyle['bg'] }} rounded-xl flex items-center justify-center shrink-0">
+                                <svg class="w-5 h-5 {{ $typeStyle['text'] }}" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">{!! $typeStyle['icon'] !!}</svg>
+                            </div>
+
+                            {{-- Details --}}
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center gap-2 mb-0.5">
+                                    <p class="text-sm font-semibold text-text truncate">{{ $transaction->description ?? $typeLabels[$transaction->type] ?? 'Transaction' }}</p>
+                                    @if($planName)
+                                        <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[8px] font-semibold bg-purple-500/10 text-purple-500 border border-purple-500/20 shrink-0">{{ $planName }}</span>
+                                    @endif
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-[10px] text-text/30">{{ $transaction->created_at->format('M d, Y') }}</span>
+                                    <span class="text-[10px] text-text/20">&middot;</span>
+                                    <span class="text-[10px] text-text/30 font-mono truncate">{{ $transaction->reference }}</span>
+                                </div>
+                            </div>
+
+                            {{-- Amount & Status --}}
+                            <div class="text-right shrink-0">
+                                <p class="text-sm font-bold {{ $transaction->type === 'earning' ? 'text-green-600' : 'text-text' }}" style="font-family: 'DM Serif Display', Georgia, serif;">
+                                    {{ $transaction->type === 'earning' ? '+' : '' }}{{ $transaction->formattedAmount() }}
+                                </p>
+                                <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-semibold {{ $statusStyle }} mt-0.5">
+                                    {{ ucfirst($transaction->status) }}
+                                </span>
+                            </div>
                         </div>
 
-                        {{-- Details --}}
-                        <div class="flex-1 min-w-0">
-                            <div class="flex items-center gap-2 mb-0.5">
-                                <p class="text-sm font-semibold text-text truncate">{{ $transaction->description ?? $typeLabels[$transaction->type] ?? 'Transaction' }}</p>
-                                @if($planName)
-                                    <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[8px] font-semibold bg-purple-500/10 text-purple-500 border border-purple-500/20 shrink-0">{{ $planName }}</span>
+                        {{-- See more toggle --}}
+                        <button @click="open = !open" class="w-full flex items-center justify-center gap-1 py-2 border-t border-gray-100 dark:border-neutral-800 text-[11px] font-medium text-primary hover:bg-gray-50 dark:hover:bg-neutral-800/50 transition-colors cursor-pointer">
+                            <span x-text="open ? 'See less' : 'See more'"></span>
+                            <svg class="w-3.5 h-3.5 transition-transform duration-200" :class="open && 'rotate-180'" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg>
+                        </button>
+
+                        {{-- Expanded details --}}
+                        <div x-show="open" x-cloak class="px-4 pb-4 pt-3 space-y-2 border-t border-gray-100 dark:border-neutral-800">
+                            <div class="flex items-center justify-between text-xs">
+                                <span class="text-text/40">{{ __('Type') }}</span>
+                                <span class="text-text/70 font-medium">{{ $typeLabels[$transaction->type] ?? ucfirst($transaction->type) }}</span>
+                            </div>
+                            <div class="flex items-center justify-between text-xs gap-4">
+                                <span class="text-text/40 shrink-0">{{ __('Reference') }}</span>
+                                <span class="text-text/70 font-mono truncate text-right">{{ $transaction->reference }}</span>
+                            </div>
+                            <div class="flex items-center justify-between text-xs">
+                                <span class="text-text/40">{{ __('Status') }}</span>
+                                <span class="text-text/70">{{ ucfirst($transaction->status) }}</span>
+                            </div>
+                            <div class="flex items-center justify-between text-xs">
+                                <span class="text-text/40">{{ __('Date') }}</span>
+                                <span class="text-text/70">{{ $transaction->created_at->format('M d, Y \a\t h:i A') }}</span>
+                            </div>
+
+                            @if($transaction->type === 'earning')
+                                <div class="flex items-center justify-between text-xs">
+                                    <span class="text-text/40">{{ __('Task') }}</span>
+                                    <span class="text-text/70">{{ ucfirst($transaction->metadata['kind'] ?? 'Earning') }}</span>
+                                </div>
+                                @if(!empty($transaction->metadata['language']))
+                                    <div class="flex items-center justify-between text-xs">
+                                        <span class="text-text/40">{{ __('Language') }}</span>
+                                        <span class="text-text/70">{{ strtoupper($transaction->metadata['language']) }}</span>
+                                    </div>
                                 @endif
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <span class="text-[10px] text-text/30">{{ $transaction->created_at->format('M d, Y') }}</span>
-                                <span class="text-[10px] text-text/20">&middot;</span>
-                                <span class="text-[10px] text-text/30 font-mono">{{ $transaction->reference }}</span>
-                            </div>
-                        </div>
-
-                        {{-- Amount & Status --}}
-                        <div class="text-right shrink-0">
-                            <p class="text-sm font-bold {{ $transaction->type === 'earning' ? 'text-green-600' : 'text-text' }}" style="font-family: 'DM Serif Display', Georgia, serif;">
-                                {{ $transaction->type === 'earning' ? '+' : '' }}{{ $transaction->formattedAmount() }}
-                            </p>
-                            <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-semibold {{ $statusStyle }} mt-0.5">
-                                {{ ucfirst($transaction->status) }}
-                            </span>
+                                @if(!empty($transaction->metadata['rate']))
+                                    <div class="flex items-center justify-between text-xs">
+                                        <span class="text-text/40">{{ __('Rate') }}</span>
+                                        <span class="text-text/70">₦{{ number_format((float) $transaction->metadata['rate'], 2) }}</span>
+                                    </div>
+                                @endif
+                            @elseif($transaction->type === 'plan_purchase')
+                                @if($planName)
+                                    <div class="flex items-center justify-between text-xs">
+                                        <span class="text-text/40">{{ __('Plan') }}</span>
+                                        <span class="text-text/70">{{ $planName }}</span>
+                                    </div>
+                                @endif
+                                @if($transaction->bachs_checkout_id)
+                                    <div class="flex items-center justify-between text-xs gap-4">
+                                        <span class="text-text/40 shrink-0">{{ __('Checkout ID') }}</span>
+                                        <span class="text-text/70 font-mono truncate text-right">{{ $transaction->bachs_checkout_id }}</span>
+                                    </div>
+                                @endif
+                            @elseif($transaction->type === 'withdrawal')
+                                @if(!empty($transaction->metadata['withdrawal_request_id']))
+                                    <div class="flex items-center justify-between text-xs gap-4">
+                                        <span class="text-text/40 shrink-0">{{ __('Withdrawal ID') }}</span>
+                                        <span class="text-text/70 font-mono text-right">{{ $transaction->metadata['withdrawal_request_id'] }}</span>
+                                    </div>
+                                @endif
+                                @if(!empty($transaction->metadata['decline_reason']))
+                                    <div class="flex items-start justify-between text-xs gap-4">
+                                        <span class="text-text/40 shrink-0">{{ __('Reason') }}</span>
+                                        <span class="text-red-600 dark:text-red-400 text-right">{{ $declineReasons[$transaction->metadata['decline_reason']] ?? $transaction->metadata['decline_reason'] }}</span>
+                                    </div>
+                                @endif
+                            @endif
                         </div>
                     </div>
                 @endforeach

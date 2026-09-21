@@ -45,6 +45,7 @@ class User extends Authenticatable implements PasskeyUser
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'banned_until' => 'datetime',
         ];
     }
 
@@ -82,6 +83,11 @@ class User extends Authenticatable implements PasskeyUser
         return $this->hasOne(PayoutAccount::class);
     }
 
+    public function withdrawalRequests(): HasMany
+    {
+        return $this->hasMany(WithdrawalRequest::class);
+    }
+
     public function transactions(): HasMany
     {
         return $this->hasMany(Transaction::class);
@@ -107,5 +113,10 @@ class User extends Authenticatable implements PasskeyUser
     public function isAdmin(): bool
     {
         return $this->email === 'admin@vocalpay.co';
+    }
+
+    public function isBanned(): bool
+    {
+        return $this->banned_until !== null && $this->banned_until->isFuture();
     }
 }

@@ -127,3 +127,7 @@ select:focus[data-flux-control] {
 .animate-marquee:hover {
     animation-play-state: paused;
 }
+
+[x-cloak] {
+    display: none !important;
+}

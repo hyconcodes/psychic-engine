@@ -1,16 +1,4 @@
 <x-layouts::app>
-    <x-slot name="header">
-        <div class="flex items-center gap-3">
-            <a href="{{ route('dashboard') }}" class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 dark:bg-neutral-800 hover:bg-gray-200 dark:hover:bg-neutral-700 transition-colors">
-                <svg class="w-4 h-4 text-text/60" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5"/></svg>
-            </a>
-            <div>
-                <h2 class="font-semibold text-xl text-text dark:text-text leading-tight">Transactions</h2>
-                <p class="text-xs text-text/50">Your complete transaction history</p>
-            </div>
-        </div>
-    </x-slot>
-
     @php
         $typeIcons = [
             'plan_purchase' => ['bg' => 'bg-purple-500/10 dark:bg-purple-500/20', 'text' => 'text-purple-500', 'icon' => '<path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z"/>'],
@@ -36,6 +24,18 @@
     @endphp
 
     <div class="space-y-5 pb-8">
+        {{-- Header --}}
+        <div class="flex items-center gap-3">
+            <a href="{{ route('dashboard') }}" class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 dark:bg-neutral-800 hover:bg-gray-200 dark:hover:bg-neutral-700 transition-colors">
+                <svg class="w-4 h-4 text-text/60" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5"/></svg>
+            </a>
+            <div>
+                <h2 class="font-semibold text-xl text-text dark:text-text leading-tight">Transactions</h2>
+                <p class="text-xs text-text/50">Your complete transaction history</p>
+            </div>
+            <x-refresh-button class="ml-auto" />
+        </div>
+
         {{-- Summary Cards --}}
         <div class="grid grid-cols-3 gap-3">
             <div class="bg-white dark:bg-neutral-900 rounded-xl border border-gray-100 dark:border-neutral-800 p-4 text-center shadow-sm">

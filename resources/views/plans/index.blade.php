@@ -1,16 +1,4 @@
 <x-layouts::app>
-    <x-slot name="header">
-        <div class="flex items-center gap-3">
-            <a href="{{ route('dashboard') }}" class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 dark:bg-neutral-800 hover:bg-gray-200 dark:hover:bg-neutral-700 transition-colors">
-                <svg class="w-4 h-4 text-text/60" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5"/></svg>
-            </a>
-            <div>
-                <h2 class="font-semibold text-xl text-text dark:text-text leading-tight">Plans & Pricing</h2>
-                <p class="text-xs text-text/50">You can activate a plan instantly with your deposit balance.</p>
-            </div>
-        </div>
-    </x-slot>
-
     @php
         $user = auth()->user();
         $wallet = $user->wallet;
@@ -33,6 +21,19 @@
             ['bg' => 'bg-rose-500/10 dark:bg-rose-500/20', 'text' => 'text-rose-500'],
         ];
     @endphp
+
+    <div class="space-y-5 pb-8">
+        {{-- Header --}}
+        <div class="flex items-center gap-3">
+            <a href="{{ route('dashboard') }}" class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 dark:bg-neutral-800 hover:bg-gray-200 dark:hover:bg-neutral-700 transition-colors">
+                <svg class="w-4 h-4 text-text/60" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5"/></svg>
+            </a>
+            <div>
+                <h2 class="font-semibold text-xl text-text dark:text-text leading-tight">Plans & Pricing</h2>
+                <p class="text-xs text-text/50">You can activate a plan instantly with your deposit balance.</p>
+            </div>
+            <x-refresh-button class="ml-auto" />
+        </div>
 
         {{-- Deposit Balance Card --}}
         <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary via-primary to-secondary p-6 shadow-2xl ring-1 ring-white/10 dark:from-primary/20 dark:via-secondary/20 dark:to-primary/20">

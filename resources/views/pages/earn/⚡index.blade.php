@@ -52,6 +52,7 @@ new #[Title('Earn')] class extends Component {
             <h2 class="font-semibold text-xl text-text dark:text-text leading-tight">{{ __('Earn') }}</h2>
             <p class="text-xs text-text/50">{{ __('Your available earning tasks for today') }}</p>
         </div>
+        <x-refresh-button wire class="ml-auto" />
     </div>
 
     @if (! $hasPlan)

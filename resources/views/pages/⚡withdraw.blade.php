@@ -21,6 +21,8 @@ new #[Title('Withdraw')] class extends Component {
 
     public array $recentWithdrawals = [];
 
+    public string $password = '';
+
     public function mount(): void
     {
         $this->load();
@@ -68,21 +70,27 @@ new #[Title('Withdraw')] class extends Component {
 
     public function withdraw(WithdrawEarnings $withdraw): void
     {
+        $this->validate([
+            'password' => ['required', 'current_password'],
+        ]);
+
         try {
             $withdraw->handle(Auth::user());
         } catch (RuntimeException $e) {
             Flux::toast(variant: 'error', text: $e->getMessage());
+            $this->password = '';
 
             return;
         }
 
         Flux::toast(variant: 'success', text: __('Your tasks are under review — expect your money ASAP.'));
 
+        $this->password = '';
         $this->load();
     }
 }; ?>
 
-<div class="space-y-6" x-data="{ tab: 'tasks' }">
+<div class="space-y-6" x-data="{ tab: 'tasks', showPassword: false }">
     {{-- Header --}}
     <div class="flex items-center gap-3">
         <a href="{{ route('dashboard') }}" class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 dark:bg-neutral-800 hover:bg-gray-200 dark:hover:bg-neutral-700 transition-colors">
@@ -92,6 +100,7 @@ new #[Title('Withdraw')] class extends Component {
             <h2 class="font-semibold text-xl text-text dark:text-text leading-tight">{{ __('Withdraw') }}</h2>
             <p class="text-xs text-text/50">{{ __('Send your earnings to your bank account') }}</p>
         </div>
+        <x-refresh-button wire class="ml-auto" />
     </div>
 
     {{-- Tabs --}}
@@ -135,7 +144,7 @@ new #[Title('Withdraw')] class extends Component {
         {{-- Withdraw button --}}
         <button
             type="button"
-            wire:click="withdraw"
+            @click="showPassword = true"
             @if (! $hasPayoutAccount || $balanceRaw <= 0) disabled @endif
             class="w-full py-4 rounded-xl font-semibold text-white transition-all flex items-center justify-center gap-2 {{ (! $hasPayoutAccount || $balanceRaw <= 0) ? 'bg-gray-300 dark:bg-neutral-800 text-text/40 cursor-not-allowed' : 'bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 shadow-lg shadow-primary/20 cursor-pointer' }}"
         >
@@ -230,5 +239,42 @@ new #[Title('Withdraw')] class extends Component {
         </div>
         <h3 class="text-sm font-semibold text-text">{{ __('No affiliate earnings yet') }}</h3>
         <p class="text-xs text-text/40 mt-1">{{ __('Affiliate withdrawals will be available soon.') }}</p>
+    </div>
+
+    {{-- Password confirmation modal --}}
+    <div x-show="showPassword" x-cloak class="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" @click="showPassword = false"></div>
+        <div class="relative bg-white dark:bg-neutral-900 rounded-2xl p-6 shadow-2xl max-w-sm w-full">
+            <h3 class="text-base font-semibold text-text mb-1">{{ __('Confirm withdrawal') }}</h3>
+            <p class="text-xs text-text/50 mb-4">{{ __('Enter your password to withdraw') }} {{ $balance }}.</p>
+
+            <div class="space-y-3">
+                <div>
+                    <label for="withdraw-password" class="block text-xs font-medium text-text mb-1">{{ __('Password') }}</label>
+                    <input
+                        type="password"
+                        wire:model="password"
+                        id="withdraw-password"
+                        placeholder="••••••••"
+                        class="w-full rounded-xl border border-gray-200 dark:border-neutral-600 bg-white dark:bg-neutral-800 px-4 py-2.5 text-sm text-text placeholder-text/30 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors"
+                    >
+                    @error('password')
+                        <p class="text-xs text-red-600 dark:text-red-400 mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <button
+                    type="button"
+                    wire:click="withdraw"
+                    class="w-full py-2.5 rounded-xl bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 text-white font-semibold text-sm transition-all shadow-lg shadow-primary/20 cursor-pointer"
+                >
+                    {{ __('Confirm withdraw') }}
+                </button>
+            </div>
+
+            <button type="button" @click="showPassword = false" class="mt-3 w-full py-2 rounded-xl text-sm font-medium text-text/50 hover:text-text transition-colors cursor-pointer">
+                {{ __('Cancel') }}
+            </button>
+        </div>
     </div>
 </div>

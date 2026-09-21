@@ -17,6 +17,7 @@
         $totalReferrals = $user->referrals()->count();
         $activeReferrals = $user->referrals()->whereHas('activeSubscription')->count();
         $pendingReferrals = $totalReferrals - $activeReferrals;
+        $recentTransactions = $user->transactions()->latest()->take(5)->get();
     @endphp
     <div class="space-y-5">
 
@@ -37,9 +38,7 @@
             </div>
             <div class="flex items-center gap-1.5">
                 <x-refresh-button />
-                <button class="w-8 h-8 flex items-center justify-center rounded-full border border-gray-200 dark:border-neutral-700 hover:bg-gray-50 dark:hover:bg-neutral-800 transition-colors shrink-0">
-                    <svg class="w-4 h-4 text-text/50" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0"/></svg>
-                </button>
+                @include('partials.notifications-popup')
             </div>
         </div>
 
@@ -63,10 +62,7 @@
             </div>
             <div class="flex items-center gap-1.5">
                 <x-refresh-button />
-                <button class="w-9 h-9 flex items-center justify-center rounded-full border border-gray-200 dark:border-neutral-700 hover:bg-gray-50 dark:hover:bg-neutral-800 transition-colors relative shrink-0">
-                    <svg class="w-4 h-4 text-text/50" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0"/></svg>
-                    <span class="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-primary rounded-full border-2 border-white dark:border-neutral-900"></span>
-                </button>
+                @include('partials.notifications-popup')
             </div>
         </div>
 
@@ -263,13 +259,13 @@
                     <p class="text-[10px] text-text/40">2 activities</p>
                 </div>
             </a>
-            <a href="{{ route('plans.index') }}" class="flex items-center gap-2.5 bg-white dark:bg-neutral-900 rounded-xl border border-gray-100 dark:border-neutral-800 p-3 hover:border-amber-300 hover:shadow-sm transition-all group">
+            <a href="{{ route('affiliate.earners') }}" wire:navigate class="flex items-center gap-2.5 bg-white dark:bg-neutral-900 rounded-xl border border-gray-100 dark:border-neutral-800 p-3 hover:border-amber-300 hover:shadow-sm transition-all group">
                 <div class="w-8 h-8 bg-gradient-to-br from-amber-50 to-amber-100/50 dark:from-amber-900/20 dark:to-amber-900/10 rounded-lg flex items-center justify-center shrink-0">
                     <svg class="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 18.75h-9m9 0a3 3 0 013 3h-15a3 3 0 013-3m9 0v-3.375c0-.621-.503-1.125-1.125-1.125h-.871M7.5 18.75v-3.375c0-.621.504-1.125 1.125-1.125h.872m5.007 0H9.497m5.007 0a7.454 7.454 0 01-.982-3.172M9.497 14.25a7.454 7.454 0 00.981-3.172M5.25 4.236c-.982.143-1.954.317-2.916.52A6.003 6.003 0 007.73 9.728M5.25 4.236V4.5c0 2.108.966 3.99 2.48 5.228M5.25 4.236V2.721C7.456 2.41 9.71 2.25 12 2.25c2.291 0 4.545.16 6.75.47v1.516M18.75 4.236c.982.143 1.954.317 2.916.52A6.003 6.003 0 0016.27 9.728M18.75 4.236V4.5c0 2.108-.966 3.99-2.48 5.228m0 0a6.023 6.023 0 01-2.77.665 6.023 6.023 0 01-2.77-.665"/></svg>
                 </div>
                 <div class="flex-1 min-w-0">
-                    <p class="text-xs font-semibold text-text">Star earners</p>
-                    <p class="text-[10px] text-text/40">Top 10 this week</p>
+                    <p class="text-xs font-semibold text-text">Affiliate Earners</p>
+                    <p class="text-[10px] text-text/40">Top earners</p>
                 </div>
             </a>
         </div>

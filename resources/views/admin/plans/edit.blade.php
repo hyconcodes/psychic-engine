@@ -49,6 +49,12 @@
                 </div>
 
                 <div>
+                    <label for="referral_commission" class="block text-xs font-medium text-text mb-1">{{ __('Referral commission (₦)') }}</label>
+                    <input type="number" name="referral_commission" id="referral_commission" value="{{ old('referral_commission', $plan->referral_commission) }}" required min="0" step="0.01"
+                        class="w-full rounded-xl border border-gray-200 dark:border-neutral-600 bg-white dark:bg-neutral-800 px-3.5 py-2 text-sm text-text placeholder-text/30 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors">
+                </div>
+
+                <div>
                     <label class="block text-xs font-medium text-text mb-1">{{ __('Features') }}</label>
                     <div id="features-container" class="space-y-2">
                         @foreach (old('features', $plan->features ?? []) as $feature)

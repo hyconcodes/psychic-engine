@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Plan;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Title;
 use Livewire\Component;
@@ -16,6 +17,10 @@ new #[Title('Affiliate Dashboard')] class extends Component {
     public int $activeReferrals = 0;
 
     public int $pendingReferrals = 0;
+
+    public array $commissionPerPlan = [];
+
+    public string $referralLink = '';
 
     public function mount(): void
     {
@@ -50,6 +55,13 @@ new #[Title('Affiliate Dashboard')] class extends Component {
                 'commission' => $commission ? (float) $commission->amount : null,
             ];
         })->toArray();
+
+        $this->commissionPerPlan = Plan::ordered()->get()->map(fn (Plan $plan) => [
+            'name' => $plan->name,
+            'commission' => (float) $plan->referral_commission,
+        ])->toArray();
+
+        $this->referralLink = route('register').'?ref='.$user->username;
     }
 }; ?>
 
@@ -63,7 +75,7 @@ new #[Title('Affiliate Dashboard')] class extends Component {
             <h2 class="font-semibold text-xl text-text dark:text-text leading-tight">{{ __('Affiliate Dashboard') }}</h2>
             <p class="text-xs text-text/50">{{ __('Your referrals and commission') }}</p>
         </div>
-        <x-refresh-button wire class="ml-auto" />
+        <x-refresh-button class="ml-auto" />
     </div>
 
     {{-- Summary cards --}}
@@ -79,6 +91,47 @@ new #[Title('Affiliate Dashboard')] class extends Component {
         <div class="bg-white dark:bg-neutral-900 rounded-xl border border-gray-100 dark:border-neutral-800 p-3.5 shadow-sm">
             <p class="text-lg font-bold text-primary" style="font-family: 'DM Serif Display', Georgia, serif;">{{ $totalReferrals }}</p>
             <p class="text-[10px] text-text/40 mt-0.5">{{ __('Referrals') }}</p>
+        </div>
+    </div>
+
+    {{-- Copy referral link --}}
+    <div
+        x-data="{
+            referralLink: @js($referralLink),
+            async copy() {
+                try {
+                    await navigator.clipboard.writeText(this.referralLink);
+                    $flux.toast('{{ __('Referral link copied.') }}', { variant: 'success' });
+                } catch {
+                    const textarea = document.createElement('textarea');
+                    textarea.value = this.referralLink;
+                    textarea.style.position = 'fixed';
+                    textarea.style.opacity = '0';
+                    document.body.appendChild(textarea);
+                    textarea.select();
+                    document.execCommand('copy');
+                    textarea.remove();
+                }
+            }
+        }"
+        class="flex items-center gap-2 bg-white dark:bg-neutral-900 rounded-xl border border-gray-100 dark:border-neutral-800 p-3 shadow-sm"
+    >
+        <div class="flex-1 bg-gray-50 dark:bg-neutral-800 rounded-lg px-3 py-2 text-[11px] text-text/50 font-mono truncate">{{ $referralLink }}</div>
+        <button type="button" @click="copy()" class="px-3 py-2 bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 text-white text-[11px] font-semibold rounded-lg transition-all shrink-0 cursor-pointer shadow-sm">
+            {{ __('Copy') }}
+        </button>
+    </div>
+
+    {{-- Commission per plan --}}
+    <div class="bg-white dark:bg-neutral-900 rounded-xl border border-gray-100 dark:border-neutral-800 p-4 shadow-sm">
+        <h3 class="text-xs font-semibold text-text mb-2.5">{{ __('Commission per plan activated') }}</h3>
+        <div class="space-y-1.5">
+            @foreach ($commissionPerPlan as $item)
+                <div class="flex items-center justify-between text-xs">
+                    <span class="text-text/60">{{ $item['name'] }}</span>
+                    <span class="font-semibold text-green-600">₦{{ number_format($item['commission'], 0) }}</span>
+                </div>
+            @endforeach
         </div>
     </div>
 

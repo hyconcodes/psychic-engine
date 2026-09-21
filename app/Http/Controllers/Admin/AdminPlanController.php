@@ -29,6 +29,7 @@ class AdminPlanController extends Controller
             'price' => 'required|numeric|min:0',
             'voice_earn_per_session' => 'required|numeric|min:0',
             'word_game_per_word' => 'required|numeric|min:0',
+            'referral_commission' => 'required|numeric|min:0',
             'features' => 'required|array',
             'is_popular' => 'boolean',
             'is_active' => 'boolean',

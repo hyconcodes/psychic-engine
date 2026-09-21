@@ -126,3 +126,24 @@ test('affiliate dashboard page renders for authenticated users', function () {
         ->assertOk()
         ->assertSee('Affiliate Dashboard');
 });
+
+test('affiliate earners page renders the top earners', function () {
+    $referrerUser = referrer();
+    $plan = referralPlan(2000);
+    $referred = User::factory()->create(['referred_by' => $referrerUser->id]);
+
+    AffiliateCommission::create([
+        'referrer_id' => $referrerUser->id,
+        'referred_user_id' => $referred->id,
+        'plan_id' => $plan->id,
+        'amount' => 2000,
+        'status' => 'available',
+    ]);
+
+    $this->actingAs($referrerUser);
+
+    $this->get(route('affiliate.earners'))
+        ->assertOk()
+        ->assertSee('Affiliate Earners')
+        ->assertSee('@'.$referrerUser->username);
+});

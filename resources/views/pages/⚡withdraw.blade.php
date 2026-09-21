@@ -128,7 +128,7 @@ new #[Title('Withdraw')] class extends Component {
             <h2 class="font-semibold text-xl text-text dark:text-text leading-tight">{{ __('Withdraw') }}</h2>
             <p class="text-xs text-text/50">{{ __('Send your earnings to your bank account') }}</p>
         </div>
-        <x-refresh-button wire class="ml-auto" />
+        <x-refresh-button class="ml-auto" />
     </div>
 
     {{-- Tabs --}}

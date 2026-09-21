@@ -29,6 +29,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::livewire('withdraw', 'pages::withdraw')->name('withdraw.index');
 
     Route::livewire('affiliate', 'pages::affiliate')->name('affiliate.index');
+    Route::livewire('affiliate/earners', 'pages::affiliate.earners')->name('affiliate.earners');
 });
 
 require __DIR__.'/settings.php';

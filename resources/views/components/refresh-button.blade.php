@@ -1,8 +1,6 @@
-@props(['wire' => false])
-
 <button
     type="button"
-    @if($wire) wire:click="$refresh" @else onclick="window.location.reload()" @endif
+    onclick="window.location.reload()"
     title="{{ __('Refresh') }}"
     {{ $attributes->merge(['class' => 'w-7 h-7 flex items-center justify-center rounded-full bg-gray-100 dark:bg-neutral-800 text-text/50 hover:text-primary hover:bg-gray-200 dark:hover:bg-neutral-700 transition-colors cursor-pointer shrink-0']) }}
 >

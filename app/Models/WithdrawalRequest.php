@@ -15,12 +15,21 @@ class WithdrawalRequest extends Model
         'spamming' => 'Spamming — disabled for 1 week',
     ];
 
+    public const DEDUCTION_REASONS = [
+        'low_quality' => 'Low quality recording',
+        'partial' => 'Partial completion',
+        'wrong_content' => 'Wrong content read',
+        'background_noise' => 'Background noise',
+    ];
+
     protected $fillable = [
         'user_id',
         'payout_account_id',
         'amount',
+        'deduct_amount',
         'status',
         'decline_reason',
+        'deduct_reason',
         'early_withdrawal',
         'requested_at',
         'reviewed_at',
@@ -31,6 +40,7 @@ class WithdrawalRequest extends Model
 
     protected $casts = [
         'amount' => 'decimal:2',
+        'deduct_amount' => 'decimal:2',
         'early_withdrawal' => 'boolean',
         'requested_at' => 'datetime',
         'reviewed_at' => 'datetime',

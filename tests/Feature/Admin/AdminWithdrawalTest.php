@@ -108,6 +108,38 @@ test('declining with spamming bans the user for a week', function () {
 
     expect($request->status)->toBe('declined');
     expect($request->user->isBanned())->toBeTrue();
+
+    $transaction = Transaction::where('type', 'withdrawal')->latest()->first();
+    expect($transaction->status)->toBe('failed');
+    expect($transaction->metadata['decline_reason'])->toBe('spamming');
+});
+
+test('deducting approves the request with a reduced amount and records the deduction', function () {
+    $this->actingAs(adminUser());
+
+    $this->mock(BachsServiceInterface::class, function ($mock) {
+        $mock->shouldReceive('createPayoutDestination')->once()->andReturn('pd_test');
+        $mock->shouldReceive('createPayout')->once()->andReturn(['id' => 'pay_1', 'reference' => 'WD-1']);
+    });
+
+    $request = pendingRequest();
+
+    $this->post(route('admin.withdrawals.deduct', $request), [
+        'deduct_amount' => 30,
+        'deduct_reason' => 'low_quality',
+    ])->assertRedirect(route('admin.withdrawals.index'));
+
+    $request->refresh();
+
+    expect($request->status)->toBe('approved');
+    expect((float) $request->deduct_amount)->toEqual(30.0);
+    expect($request->deduct_reason)->toBe('low_quality');
+
+    $transaction = Transaction::where('type', 'withdrawal')->latest()->first();
+    expect($transaction->status)->toBe('successful');
+    expect((float) $transaction->amount)->toEqual(70.0);
+    expect($transaction->metadata['deduct_amount'])->toEqual(30);
+    expect($transaction->metadata['deduct_reason'])->toBe('low_quality');
 });
 
 test('a banned user is redirected to login', function () {

@@ -34,6 +34,7 @@ class AdminWithdrawalController extends Controller
         return view('admin.withdrawals.review', [
             'withdrawal' => $withdrawal,
             'reasons' => WithdrawalRequest::DECLINE_REASONS,
+            'deductionReasons' => WithdrawalRequest::DEDUCTION_REASONS,
         ]);
     }
 
@@ -43,27 +44,8 @@ class AdminWithdrawalController extends Controller
             return back()->with('toast_message', 'This request has already been reviewed.')->with('toast_variant', 'warning');
         }
 
-        $payoutAccount = $withdrawal->payoutAccount;
-
         try {
-            $destinationId = $payoutAccount->bachs_destination_id;
-
-            if (! $destinationId) {
-                $destinationId = $bachs->createPayoutDestination(
-                    $payoutAccount->account_name,
-                    'NGN',
-                    $payoutAccount->account_number,
-                    $payoutAccount->bank_code,
-                );
-
-                $payoutAccount->update(['bachs_destination_id' => $destinationId]);
-            }
-
-            $payout = $bachs->createPayout(
-                $destinationId,
-                number_format((float) $withdrawal->amount, 2, '.', ''),
-                'WD-'.$withdrawal->id.'-'.time(),
-            );
+            $payout = $this->createBachsPayout($withdrawal, (float) $withdrawal->amount, $bachs);
         } catch (BachsException $e) {
             return back()->with('toast_message', 'Payout failed: '.$e->getMessage())->with('toast_variant', 'error');
         }
@@ -77,13 +59,71 @@ class AdminWithdrawalController extends Controller
                 'bachs_reference' => $payout['reference'] ?? null,
             ]);
 
-            Transaction::where('metadata->withdrawal_request_id', $withdrawal->id)
-                ->where('status', 'pending')
-                ->update(['status' => 'successful']);
+            $this->markTransaction($withdrawal, 'successful');
         });
 
         return redirect()->route('admin.withdrawals.index')
             ->with('toast_message', 'Withdrawal approved and payout sent.')
+            ->with('toast_variant', 'success');
+    }
+
+    public function deduct(Request $request, WithdrawalRequest $withdrawal, BachsServiceInterface $bachs): RedirectResponse
+    {
+        if ($withdrawal->status !== 'pending') {
+            return back()->with('toast_message', 'This request has already been reviewed.')->with('toast_variant', 'warning');
+        }
+
+        $validated = $request->validate([
+            'deduct_amount' => ['required', 'numeric', 'min:1'],
+            'deduct_reason' => ['required', 'string', 'in:'.implode(',', array_keys(WithdrawalRequest::DEDUCTION_REASONS))],
+        ]);
+
+        $original = (float) $withdrawal->amount;
+        $deduct = (float) $validated['deduct_amount'];
+
+        if ($deduct >= $original) {
+            return back()->with('toast_message', 'Deduction must be less than the withdrawal amount.')->with('toast_variant', 'error');
+        }
+
+        $net = $original - $deduct;
+
+        try {
+            $payout = $this->createBachsPayout($withdrawal, $net, $bachs);
+        } catch (BachsException $e) {
+            return back()->with('toast_message', 'Payout failed: '.$e->getMessage())->with('toast_variant', 'error');
+        }
+
+        DB::transaction(function () use ($withdrawal, $payout, $deduct, $net, $original, $validated) {
+            $withdrawal->update([
+                'status' => 'approved',
+                'deduct_amount' => $deduct,
+                'deduct_reason' => $validated['deduct_reason'],
+                'reviewed_at' => now(),
+                'reviewed_by' => Auth::id(),
+                'bachs_payout_id' => $payout['id'] ?? null,
+                'bachs_reference' => $payout['reference'] ?? null,
+            ]);
+
+            $transaction = Transaction::where('metadata->withdrawal_request_id', $withdrawal->id)
+                ->where('status', 'pending')
+                ->first();
+
+            if ($transaction) {
+                $metadata = $transaction->metadata ?? [];
+                $metadata['deduct_amount'] = $deduct;
+                $metadata['deduct_reason'] = $validated['deduct_reason'];
+                $metadata['original_amount'] = $original;
+
+                $transaction->update([
+                    'status' => 'successful',
+                    'amount' => $net,
+                    'metadata' => $metadata,
+                ]);
+            }
+        });
+
+        return redirect()->route('admin.withdrawals.index')
+            ->with('toast_message', 'Withdrawal approved with a deduction of ₦'.number_format($deduct, 2).'.')
             ->with('toast_variant', 'success');
     }
 
@@ -105,17 +145,19 @@ class AdminWithdrawalController extends Controller
                 'reviewed_by' => Auth::id(),
             ]);
 
-            Transaction::where('metadata->withdrawal_request_id', $withdrawal->id)
+            $transaction = Transaction::where('metadata->withdrawal_request_id', $withdrawal->id)
                 ->where('status', 'pending')
-                ->each(function (Transaction $transaction) use ($validated) {
-                    $metadata = $transaction->metadata ?? [];
-                    $metadata['decline_reason'] = $validated['decline_reason'];
+                ->first();
 
-                    $transaction->update([
-                        'status' => 'failed',
-                        'metadata' => $metadata,
-                    ]);
-                });
+            if ($transaction) {
+                $metadata = $transaction->metadata ?? [];
+                $metadata['decline_reason'] = $validated['decline_reason'];
+
+                $transaction->update([
+                    'status' => 'failed',
+                    'metadata' => $metadata,
+                ]);
+            }
 
             if ($validated['decline_reason'] === 'spamming') {
                 $withdrawal->user()->update([
@@ -138,5 +180,36 @@ class AdminWithdrawalController extends Controller
         }
 
         return Storage::disk($disk)->response($submission->audio_path);
+    }
+
+    private function createBachsPayout(WithdrawalRequest $withdrawal, float $amount, BachsServiceInterface $bachs): array
+    {
+        $payoutAccount = $withdrawal->payoutAccount;
+
+        $destinationId = $payoutAccount->bachs_destination_id;
+
+        if (! $destinationId) {
+            $destinationId = $bachs->createPayoutDestination(
+                $payoutAccount->account_name,
+                'NGN',
+                $payoutAccount->account_number,
+                $payoutAccount->bank_code,
+            );
+
+            $payoutAccount->update(['bachs_destination_id' => $destinationId]);
+        }
+
+        return $bachs->createPayout(
+            $destinationId,
+            number_format($amount, 2, '.', ''),
+            'WD-'.$withdrawal->id.'-'.time(),
+        );
+    }
+
+    private function markTransaction(WithdrawalRequest $withdrawal, string $status): void
+    {
+        Transaction::where('metadata->withdrawal_request_id', $withdrawal->id)
+            ->where('status', 'pending')
+            ->update(['status' => $status]);
     }
 }

@@ -31,6 +31,8 @@
         ];
 
         $declineReasons = \App\Models\WithdrawalRequest::DECLINE_REASONS;
+
+        $deductionReasons = \App\Models\WithdrawalRequest::DEDUCTION_REASONS;
     @endphp
 
     <div class="space-y-5 pb-8">
@@ -152,6 +154,24 @@
                                     <div class="flex items-center justify-between text-xs gap-4">
                                         <span class="text-text/40 shrink-0">{{ __('Withdrawal ID') }}</span>
                                         <span class="text-text/70 font-mono text-right">{{ $transaction->metadata['withdrawal_request_id'] }}</span>
+                                    </div>
+                                @endif
+                                @if(!empty($transaction->metadata['original_amount']))
+                                    <div class="flex items-center justify-between text-xs">
+                                        <span class="text-text/40">{{ __('Original amount') }}</span>
+                                        <span class="text-text/70">₦{{ number_format((float) $transaction->metadata['original_amount'], 2) }}</span>
+                                    </div>
+                                @endif
+                                @if(!empty($transaction->metadata['deduct_amount']))
+                                    <div class="flex items-center justify-between text-xs">
+                                        <span class="text-text/40">{{ __('Deduction') }}</span>
+                                        <span class="text-red-600 dark:text-red-400">-₦{{ number_format((float) $transaction->metadata['deduct_amount'], 2) }}</span>
+                                    </div>
+                                @endif
+                                @if(!empty($transaction->metadata['deduct_reason']))
+                                    <div class="flex items-start justify-between text-xs gap-4">
+                                        <span class="text-text/40 shrink-0">{{ __('Deduction reason') }}</span>
+                                        <span class="text-text/70 text-right">{{ $deductionReasons[$transaction->metadata['deduct_reason']] ?? $transaction->metadata['deduct_reason'] }}</span>
                                     </div>
                                 @endif
                                 @if(!empty($transaction->metadata['decline_reason']))

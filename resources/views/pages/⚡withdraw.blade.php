@@ -59,6 +59,9 @@ new #[Title('Withdraw')] class extends Component {
                 'reference' => $transaction->reference,
                 'description' => $transaction->description,
                 'decline_reason' => $transaction->metadata['decline_reason'] ?? null,
+                'deduct_amount' => $transaction->metadata['deduct_amount'] ?? null,
+                'deduct_reason' => $transaction->metadata['deduct_reason'] ?? null,
+                'original_amount' => $transaction->metadata['original_amount'] ?? null,
             ])
             ->toArray();
     }
@@ -184,6 +187,24 @@ new #[Title('Withdraw')] class extends Component {
                                     <span class="text-text/40">{{ __('Date') }}</span>
                                     <span class="text-text/70">{{ $withdrawal['datetime'] }}</span>
                                 </div>
+                                @if ($withdrawal['original_amount'])
+                                    <div class="flex items-center justify-between text-xs">
+                                        <span class="text-text/40">{{ __('Original amount') }}</span>
+                                        <span class="text-text/70">₦{{ number_format((float) $withdrawal['original_amount'], 2) }}</span>
+                                    </div>
+                                @endif
+                                @if ($withdrawal['deduct_amount'])
+                                    <div class="flex items-center justify-between text-xs">
+                                        <span class="text-text/40">{{ __('Deduction') }}</span>
+                                        <span class="text-red-600 dark:text-red-400">-₦{{ number_format((float) $withdrawal['deduct_amount'], 2) }}</span>
+                                    </div>
+                                @endif
+                                @if ($withdrawal['deduct_reason'])
+                                    <div class="flex items-start justify-between text-xs gap-4">
+                                        <span class="text-text/40 shrink-0">{{ __('Deduction reason') }}</span>
+                                        <span class="text-text/70 text-right">{{ \App\Models\WithdrawalRequest::DEDUCTION_REASONS[$withdrawal['deduct_reason']] ?? $withdrawal['deduct_reason'] }}</span>
+                                    </div>
+                                @endif
                                 @if ($withdrawal['decline_reason'])
                                     <div class="flex items-start justify-between text-xs gap-4">
                                         <span class="text-text/40 shrink-0">{{ __('Reason') }}</span>

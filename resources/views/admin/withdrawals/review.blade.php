@@ -1,5 +1,5 @@
 <x-layouts::app>
-    <div class="space-y-5" x-data="{ showDecline: false }">
+    <div class="space-y-5" x-data="{ showDecline: false, showDeduct: false, deductAmount: '' }">
         {{-- Header --}}
         <div class="flex items-center gap-3">
             <a href="{{ route('admin.withdrawals.index') }}" class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 dark:bg-neutral-800 hover:bg-gray-200 dark:hover:bg-neutral-700 transition-colors">
@@ -90,6 +90,11 @@
                     </button>
                 </form>
 
+                <button type="button" @click="showDeduct = true" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 text-white font-semibold text-sm transition-all shadow-md shadow-amber-500/20 hover:from-amber-600 hover:to-orange-700 cursor-pointer">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M18 12H6"/></svg>
+                    {{ __('Deduct') }}
+                </button>
+
                 <button type="button" @click="showDecline = true" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-red-500 to-rose-600 text-white font-semibold text-sm transition-all shadow-md shadow-red-500/20 hover:from-red-600 hover:to-rose-700 cursor-pointer">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
                     {{ __('Decline') }}
@@ -101,8 +106,57 @@
                 @if ($withdrawal->decline_reason)
                     &middot; {{ $reasons[$withdrawal->decline_reason] ?? $withdrawal->decline_reason }}
                 @endif
+                @if ($withdrawal->deduct_reason)
+                    &middot; {{ __('Deducted') }} ₦{{ number_format((float) $withdrawal->deduct_amount, 2) }}
+                @endif
             </div>
         @endif
+
+        {{-- Deduct modal --}}
+        <div x-show="showDeduct" x-cloak class="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" @click="showDeduct = false"></div>
+            <div class="relative bg-white dark:bg-neutral-900 rounded-2xl p-6 shadow-2xl max-w-sm w-full">
+                <h3 class="text-base font-semibold text-text mb-1">{{ __('Deduct & approve') }}</h3>
+                <p class="text-xs text-text/50 mb-4">{{ __('Deduct an amount from the payout and approve the rest.') }}</p>
+
+                <form method="POST" action="{{ route('admin.withdrawals.deduct', $withdrawal) }}" class="space-y-3">
+                    @csrf
+                    <div>
+                        <label for="deduct-amount" class="block text-xs font-medium text-text mb-1">{{ __('Amount to deduct (₦)') }}</label>
+                        <input
+                            type="number"
+                            name="deduct_amount"
+                            id="deduct-amount"
+                            x-model="deductAmount"
+                            step="0.01"
+                            min="1"
+                            max="{{ (int) $withdrawal->amount }}"
+                            required
+                            placeholder="0.00"
+                            class="w-full rounded-xl border border-gray-200 dark:border-neutral-600 bg-white dark:bg-neutral-800 px-4 py-2.5 text-sm text-text placeholder-text/30 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors"
+                        >
+                    </div>
+
+                    <div>
+                        <label for="deduct-reason" class="block text-xs font-medium text-text mb-1">{{ __('Reason') }}</label>
+                        <select name="deduct_reason" id="deduct-reason" required class="w-full rounded-xl border border-gray-200 dark:border-neutral-600 bg-white dark:bg-neutral-800 px-4 py-2.5 text-sm text-text focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors">
+                            <option value="">{{ __('Select a reason') }}</option>
+                            @foreach ($deductionReasons as $key => $label)
+                                <option value="{{ $key }}">{{ $label }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <button type="submit" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 text-white font-semibold text-sm transition-all shadow-md shadow-amber-500/20 cursor-pointer">
+                        {{ __('Deduct & approve') }}
+                    </button>
+                </form>
+
+                <button type="button" @click="showDeduct = false" class="mt-3 w-full py-2 rounded-xl text-sm font-medium text-text/50 hover:text-text transition-colors cursor-pointer">
+                    {{ __('Cancel') }}
+                </button>
+            </div>
+        </div>
 
         {{-- Decline modal --}}
         <div x-show="showDecline" x-cloak class="fixed inset-0 z-50 flex items-center justify-center p-4">

@@ -14,6 +14,9 @@
             ->where('type', 'withdrawal')
             ->where('status', 'successful')
             ->sum('amount');
+        $totalReferrals = $user->referrals()->count();
+        $activeReferrals = $user->referrals()->whereHas('activeSubscription')->count();
+        $pendingReferrals = $totalReferrals - $activeReferrals;
     @endphp
     <div class="space-y-5">
 
@@ -231,20 +234,20 @@
 
             <div class="grid grid-cols-3 gap-3 mb-3">
                 <div class="text-center">
-                    <p class="text-base font-bold text-text" style="font-family: 'DM Serif Display', Georgia, serif;">0</p>
+                    <p class="text-base font-bold text-text" style="font-family: 'DM Serif Display', Georgia, serif;">{{ $totalReferrals }}</p>
                     <p class="text-[9px] text-text/35 uppercase tracking-wider">Total</p>
                 </div>
                 <div class="text-center">
-                    <p class="text-base font-bold text-green-600" style="font-family: 'DM Serif Display', Georgia, serif;">0</p>
+                    <p class="text-base font-bold text-green-600" style="font-family: 'DM Serif Display', Georgia, serif;">{{ $activeReferrals }}</p>
                     <p class="text-[9px] text-text/35 uppercase tracking-wider">Active</p>
                 </div>
                 <div class="text-center">
-                    <p class="text-base font-bold text-amber-500" style="font-family: 'DM Serif Display', Georgia, serif;">0</p>
+                    <p class="text-base font-bold text-amber-500" style="font-family: 'DM Serif Display', Georgia, serif;">{{ $pendingReferrals }}</p>
                     <p class="text-[9px] text-text/35 uppercase tracking-wider">Pending</p>
                 </div>
             </div>
 
-            <a href="#" class="block text-center py-2 rounded-lg border border-gray-200 dark:border-neutral-700 text-[11px] font-medium text-text/60 hover:bg-gray-50 dark:hover:bg-neutral-800 transition-colors">
+            <a href="{{ route('affiliate.index') }}" wire:navigate class="block text-center py-2 rounded-lg border border-gray-200 dark:border-neutral-700 text-[11px] font-medium text-text/60 hover:bg-gray-50 dark:hover:bg-neutral-800 transition-colors">
                 View affiliate dashboard
             </a>
         </div>

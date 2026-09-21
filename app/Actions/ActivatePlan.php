@@ -2,6 +2,8 @@
 
 namespace App\Actions;
 
+use App\Models\AffiliateCommission;
+use App\Models\Plan;
 use App\Models\Transaction;
 use App\Models\UserSubscription;
 use Illuminate\Support\Facades\DB;
@@ -37,7 +39,36 @@ class ActivatePlan
                 $user->wallet()->create(['balance' => 0]);
             }
 
+            $this->creditReferralCommission($user, $subscription->plan_id);
+
             return true;
         });
+    }
+
+    private function creditReferralCommission($user, int $planId): void
+    {
+        if (! $user->referred_by) {
+            return;
+        }
+
+        $alreadyCommissioned = AffiliateCommission::where('referred_user_id', $user->id)->exists();
+
+        if ($alreadyCommissioned) {
+            return;
+        }
+
+        $plan = Plan::find($planId);
+
+        if (! $plan || (float) $plan->referral_commission <= 0) {
+            return;
+        }
+
+        AffiliateCommission::create([
+            'referrer_id' => $user->referred_by,
+            'referred_user_id' => $user->id,
+            'plan_id' => $planId,
+            'amount' => $plan->referral_commission,
+            'status' => 'available',
+        ]);
     }
 }

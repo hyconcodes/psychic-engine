@@ -27,6 +27,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::livewire('earn/word-game', 'pages::earn.record')->name('earn.word-game')->defaults('type', 'word');
 
     Route::livewire('withdraw', 'pages::withdraw')->name('withdraw.index');
+
+    Route::livewire('affiliate', 'pages::affiliate')->name('affiliate.index');
 });
 
 require __DIR__.'/settings.php';

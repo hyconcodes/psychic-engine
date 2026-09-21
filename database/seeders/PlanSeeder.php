@@ -18,6 +18,7 @@ class PlanSeeder extends Seeder
                 'word_game_per_word' => 50,
                 'daily_voice_tasks' => 5,
                 'daily_word_tasks' => 5,
+                'referral_commission' => 1000,
                 'features' => [
                     'Basic voice earning tasks',
                     'Word game access',
@@ -37,6 +38,7 @@ class PlanSeeder extends Seeder
                 'word_game_per_word' => 75,
                 'daily_voice_tasks' => 8,
                 'daily_word_tasks' => 8,
+                'referral_commission' => 2000,
                 'features' => [
                     'All Voice Spark features',
                     'Increased voice earning rates',
@@ -56,6 +58,7 @@ class PlanSeeder extends Seeder
                 'word_game_per_word' => 100,
                 'daily_voice_tasks' => 10,
                 'daily_word_tasks' => 15,
+                'referral_commission' => 3000,
                 'features' => [
                     'All Echo Pro features',
                     'Premium voice earning rates',
@@ -75,6 +78,7 @@ class PlanSeeder extends Seeder
                 'word_game_per_word' => 200,
                 'daily_voice_tasks' => 15,
                 'daily_word_tasks' => 25,
+                'referral_commission' => 4000,
                 'features' => [
                     'All Vox Elite features',
                     'Maximum voice earning rates',

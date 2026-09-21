@@ -1,5 +1,6 @@
 <?php
 
+use App\Actions\WithdrawAffiliateCommission;
 use App\Actions\WithdrawEarnings;
 use App\Models\EarningSubmission;
 use App\Models\Transaction;
@@ -17,11 +18,15 @@ new #[Title('Withdraw')] class extends Component {
 
     public float $wordEarnings = 0;
 
+    public float $affiliateBalance = 0;
+
     public bool $hasPayoutAccount = false;
 
     public array $recentWithdrawals = [];
 
     public string $password = '';
+
+    public string $affiliatePassword = '';
 
     public function mount(): void
     {
@@ -47,6 +52,8 @@ new #[Title('Withdraw')] class extends Component {
             ->sum('amount');
 
         $this->hasPayoutAccount = (bool) $user->payoutAccount;
+
+        $this->affiliateBalance = $user->availableAffiliateBalance();
 
         $this->recentWithdrawals = Transaction::where('user_id', $user->id)
             ->where('type', 'withdrawal')
@@ -88,9 +95,30 @@ new #[Title('Withdraw')] class extends Component {
         $this->password = '';
         $this->load();
     }
+
+    public function withdrawAffiliate(WithdrawAffiliateCommission $withdraw): void
+    {
+        $this->validate([
+            'affiliatePassword' => ['required', 'current_password'],
+        ]);
+
+        try {
+            $amount = $withdraw->handle(Auth::user(), app(\App\Services\Bachs\Contracts\BachsServiceInterface::class));
+        } catch (RuntimeException $e) {
+            Flux::toast(variant: 'error', text: $e->getMessage());
+            $this->affiliatePassword = '';
+
+            return;
+        }
+
+        Flux::toast(variant: 'success', text: __('Affiliate commission withdrawn: ₦'.number_format($amount, 2)));
+
+        $this->affiliatePassword = '';
+        $this->load();
+    }
 }; ?>
 
-<div class="space-y-6" x-data="{ tab: 'tasks', showPassword: false }">
+<div class="space-y-6" x-data="{ tab: 'tasks', showPassword: false, showAffiliatePassword: false }">
     {{-- Header --}}
     <div class="flex items-center gap-3">
         <a href="{{ route('dashboard') }}" class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 dark:bg-neutral-800 hover:bg-gray-200 dark:hover:bg-neutral-700 transition-colors">
@@ -233,12 +261,77 @@ new #[Title('Withdraw')] class extends Component {
     </div>
 
     {{-- Affiliate tab --}}
-    <div x-show="tab === 'affiliate'" class="bg-white dark:bg-neutral-900 rounded-2xl border border-gray-100 dark:border-neutral-800 p-10 text-center shadow-sm">
-        <div class="w-16 h-16 bg-gray-100 dark:bg-neutral-800 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg class="w-8 h-8 text-text/30" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z"/></svg>
+    <div x-show="tab === 'affiliate'" class="bg-white dark:bg-neutral-900 rounded-2xl border border-gray-100 dark:border-neutral-800 p-6 shadow-sm">
+        <div class="flex items-center gap-3 mb-4">
+            <div class="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center shrink-0">
+                <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z"/></svg>
+            </div>
+            <div>
+                <h3 class="text-sm font-semibold text-text">{{ __('Affiliate commission') }}</h3>
+                <p class="text-[11px] text-text/40">{{ __('Earned from your referrals') }}</p>
+            </div>
         </div>
-        <h3 class="text-sm font-semibold text-text">{{ __('No affiliate earnings yet') }}</h3>
-        <p class="text-xs text-text/40 mt-1">{{ __('Affiliate withdrawals will be available soon.') }}</p>
+
+        <div class="rounded-xl bg-gray-50 dark:bg-neutral-800/50 border border-gray-100 dark:border-neutral-800 p-4 mb-4">
+            <p class="text-[11px] text-text/40 uppercase tracking-wider mb-1">{{ __('Available to withdraw') }}</p>
+            <p class="text-2xl font-bold text-text" style="font-family: 'DM Serif Display', Georgia, serif;">₦{{ number_format($affiliateBalance, 2) }}</p>
+        </div>
+
+        @if (! $hasPayoutAccount)
+            <a href="{{ route('payout.edit') }}" wire:navigate class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-xs font-semibold border border-primary/20 hover:bg-primary/20 transition-colors">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"/></svg>
+                {{ __('Link your account') }}
+            </a>
+        @else
+            <button
+                type="button"
+                @click="showAffiliatePassword = true"
+                @if ($affiliateBalance <= 0) disabled @endif
+                class="w-full py-3 rounded-xl font-semibold text-white transition-all flex items-center justify-center gap-2 {{ $affiliateBalance <= 0 ? 'bg-gray-300 dark:bg-neutral-800 text-text/40 cursor-not-allowed' : 'bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 shadow-md shadow-primary/20 cursor-pointer' }}"
+            >
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg>
+                {{ __('Withdraw') }} ₦{{ number_format($affiliateBalance, 2) }}
+            </button>
+        @endif
+
+        <p class="text-[11px] text-amber-600 dark:text-amber-400 mt-3">{{ __('Affiliate commission is available for instant withdrawal.') }}</p>
+    </div>
+
+    {{-- Affiliate password modal --}}
+    <div x-show="showAffiliatePassword" x-cloak class="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" @click="showAffiliatePassword = false"></div>
+        <div class="relative bg-white dark:bg-neutral-900 rounded-2xl p-6 shadow-2xl max-w-sm w-full">
+            <h3 class="text-base font-semibold text-text mb-1">{{ __('Confirm withdrawal') }}</h3>
+            <p class="text-xs text-text/50 mb-4">{{ __('Enter your password to withdraw') }} ₦{{ number_format($affiliateBalance, 2) }}.</p>
+
+            <div class="space-y-3">
+                <div>
+                    <label for="affiliate-password" class="block text-xs font-medium text-text mb-1">{{ __('Password') }}</label>
+                    <input
+                        type="password"
+                        wire:model="affiliatePassword"
+                        id="affiliate-password"
+                        placeholder="••••••••"
+                        class="w-full rounded-xl border border-gray-200 dark:border-neutral-600 bg-white dark:bg-neutral-800 px-4 py-2.5 text-sm text-text placeholder-text/30 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors"
+                    >
+                    @error('affiliatePassword')
+                        <p class="text-xs text-red-600 dark:text-red-400 mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <button
+                    type="button"
+                    wire:click="withdrawAffiliate"
+                    class="w-full py-2.5 rounded-xl bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 text-white font-semibold text-sm transition-all shadow-lg shadow-primary/20 cursor-pointer"
+                >
+                    {{ __('Confirm withdraw') }}
+                </button>
+            </div>
+
+            <button type="button" @click="showAffiliatePassword = false" class="mt-3 w-full py-2 rounded-xl text-sm font-medium text-text/50 hover:text-text transition-colors cursor-pointer">
+                {{ __('Cancel') }}
+            </button>
+        </div>
     </div>
 
     {{-- Password confirmation modal --}}

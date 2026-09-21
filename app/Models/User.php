@@ -63,6 +63,16 @@ class User extends Authenticatable implements PasskeyUser
         return $this->belongsTo(self::class, 'referred_by');
     }
 
+    public function referrals(): HasMany
+    {
+        return $this->hasMany(self::class, 'referred_by');
+    }
+
+    public function affiliateCommissions(): HasMany
+    {
+        return $this->hasMany(AffiliateCommission::class, 'referrer_id');
+    }
+
     public function activeSubscription(): HasOne
     {
         return $this->hasOne(UserSubscription::class)->where('status', 'active')->latest('activated_at');
@@ -118,5 +128,12 @@ class User extends Authenticatable implements PasskeyUser
     public function isBanned(): bool
     {
         return $this->banned_until !== null && $this->banned_until->isFuture();
+    }
+
+    public function availableAffiliateBalance(): float
+    {
+        return (float) $this->affiliateCommissions()
+            ->where('status', 'available')
+            ->sum('amount');
     }
 }

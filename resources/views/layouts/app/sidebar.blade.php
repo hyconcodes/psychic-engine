@@ -67,7 +67,19 @@
                             <span class="flex-1 text-left">Admin</span>
                             <svg class="w-3.5 h-3.5 shrink-0 transition-transform duration-200" :class="adminOpen && 'rotate-180'" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg>
                         </button>
-                        <div x-show="adminOpen" x-cloak class="mt-0.5 space-y-0.5 pl-3">
+                <div x-show="adminOpen" x-cloak class="mt-0.5 space-y-0.5 pl-3">
+                            <a href="{{ route('admin.dashboard') }}" wire:navigate class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-[12px] font-medium transition-all {{ request()->routeIs('admin.dashboard') ? 'text-primary' : 'text-text/50 hover:text-text hover:bg-gray-100 dark:hover:bg-white/5' }}">
+                                <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"/></svg>
+                                {{ __('Dashboard') }}
+                            </a>
+                            <a href="{{ route('admin.users.index') }}" wire:navigate class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-[12px] font-medium transition-all {{ request()->routeIs('admin.users.*') ? 'text-primary' : 'text-text/50 hover:text-text hover:bg-gray-100 dark:hover:bg-white/5' }}">
+                                <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z"/></svg>
+                                {{ __('Users') }}
+                            </a>
+                            <a href="{{ route('admin.messages.index') }}" wire:navigate class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-[12px] font-medium transition-all {{ request()->routeIs('admin.messages.*') ? 'text-primary' : 'text-text/50 hover:text-text hover:bg-gray-100 dark:hover:bg-white/5' }}">
+                                <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"/></svg>
+                                {{ __('Messages') }}
+                            </a>
                             <a href="{{ route('admin.plans.index') }}" wire:navigate class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-[12px] font-medium transition-all {{ request()->routeIs('admin.plans.*') ? 'text-primary' : 'text-text/50 hover:text-text hover:bg-gray-100 dark:hover:bg-white/5' }}">
                                 <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z"/></svg>
                                 {{ __('Plan Management') }}
@@ -202,13 +214,22 @@
 
                 @if(auth()->check() && auth()->user()->isAdmin())
                     <flux:sidebar.group :heading="__('Admin')">
-                        <flux:sidebar.item icon="cog-6-tooth" :href="route('admin.plans.index')" wire:navigate>
+                        <flux:sidebar.item icon="home-modern" :href="route('admin.dashboard')" :current="request()->routeIs('admin.dashboard')" wire:navigate>
+                            {{ __('Dashboard') }}
+                        </flux:sidebar.item>
+                        <flux:sidebar.item icon="users" :href="route('admin.users.index')" :current="request()->routeIs('admin.users.*')" wire:navigate>
+                            {{ __('Users') }}
+                        </flux:sidebar.item>
+                        <flux:sidebar.item icon="envelope" :href="route('admin.messages.index')" :current="request()->routeIs('admin.messages.*')" wire:navigate>
+                            {{ __('Messages') }}
+                        </flux:sidebar.item>
+                        <flux:sidebar.item icon="cog-6-tooth" :href="route('admin.plans.index')" :current="request()->routeIs('admin.plans.*')" wire:navigate>
                             {{ __('Plan Management') }}
                         </flux:sidebar.item>
-                        <flux:sidebar.item icon="banknotes" :href="route('admin.withdrawals.index')" wire:navigate>
+                        <flux:sidebar.item icon="banknotes" :href="route('admin.withdrawals.index')" :current="request()->routeIs('admin.withdrawals.*')" wire:navigate>
                             {{ __('Withdrawal Review') }}
                         </flux:sidebar.item>
-                        <flux:sidebar.item icon="document-text" :href="route('admin.prompts.index')" wire:navigate>
+                        <flux:sidebar.item icon="document-text" :href="route('admin.prompts.index')" :current="request()->routeIs('admin.prompts.*')" wire:navigate>
                             {{ __('Earning Prompts') }}
                         </flux:sidebar.item>
                     </flux:sidebar.group>

@@ -50,6 +50,6 @@ class AffiliateCommissionSeeder extends Seeder
             ]);
         }
 
-        $this->command->info('Seeded 20 affiliate referrers with commissions.');
+        $this->command->info('Created 20 affiliate referrers with commissions.');
     }
 }

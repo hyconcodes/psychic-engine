@@ -19,12 +19,16 @@ class DatabaseSeeder extends Seeder
             AdminUserSeeder::class,
             PlanSeeder::class,
             EarningPromptSeeder::class,
+            BulkEarningPromptSeeder::class,
+            AffiliateCommissionSeeder::class,
         ]);
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'username' => 'testuser',
-            'email' => 'test@example.com',
-        ]);
+        User::firstOrCreate(
+            ['email' => 'test@example.com'],
+            [
+                'name' => 'Test User',
+                'username' => 'testuser',
+            ]
+        );
     }
 }

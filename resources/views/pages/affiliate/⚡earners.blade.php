@@ -57,22 +57,26 @@ new #[Title('Affiliate Earners')] class extends Component {
         }
 
         $max = $top[0]['total'] > 0 ? $top[0]['total'] : 1;
+        $barMaxPx = 120;
 
-        $order = [1, 0, 2]; // second, first (highest), third
+        $order = [1, 0, 2];
+        $colors = ['#22c55e', '#2563eb', '#22c55e'];
 
         $this->barChart = collect($order)
-            ->map(function ($index) use ($top, $max) {
+            ->map(function ($index) use ($top, $max, $barMaxPx, $colors, $order) {
                 if (! isset($top[$index])) {
                     return null;
                 }
 
-                $height = round(($top[$index]['total'] / $max) * 100);
+                $heightPx = max(round(($top[$index]['total'] / $max) * $barMaxPx), 16);
+                $pos = array_search($index, $order);
 
                 return [
                     'username' => $top[$index]['username'],
                     'initials' => $top[$index]['initials'],
                     'total' => $top[$index]['total'],
-                    'height' => max($height, 20),
+                    'heightPx' => $heightPx,
+                    'color' => $colors[$pos] ?? $colors[0],
                 ];
             })
             ->filter()
@@ -115,12 +119,12 @@ new #[Title('Affiliate Earners')] class extends Component {
         {{-- 3-bar chart --}}
         <div class="bg-white dark:bg-neutral-900 rounded-xl border border-gray-100 dark:border-neutral-800 p-5 shadow-sm">
             <h3 class="text-xs font-semibold text-text mb-4 text-center">{{ __('Top earners') }}</h3>
-            <div class="flex items-end justify-center gap-4 h-44">
+            <div class="flex items-end justify-center gap-4" style="height: 180px">
                 @foreach ($barChart as $bar)
-                    <div class="flex flex-col items-center gap-1.5 flex-1 max-w-[80px]">
-                        <span class="text-[11px] font-bold text-green-600">₦{{ number_format($bar['total'], 0) }}</span>
-                        <div class="w-full bg-gradient-to-t from-primary to-secondary rounded-t-lg" style="height: {{ $bar['height'] }}%"></div>
-                        <span class="text-[10px] font-medium text-text/60 truncate w-full text-center">{{ '@'.$bar['username'] }}</span>
+                    <div class="flex flex-col items-center flex-1 max-w-[80px] h-full">
+                        <span class="text-[11px] font-bold text-green-600 mb-1.5">₦{{ number_format($bar['total'], 0) }}</span>
+                        <div class="w-full rounded-t-lg mt-auto" style="height: {{ $bar['heightPx'] }}px; background-color: {{ $bar['color'] }};"></div>
+                        <span class="text-[10px] font-medium text-text/60 truncate w-full text-center mt-1.5">{{ '@'.$bar['username'] }}</span>
                     </div>
                 @endforeach
             </div>

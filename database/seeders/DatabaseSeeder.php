@@ -23,12 +23,12 @@ class DatabaseSeeder extends Seeder
             // AffiliateCommissionSeeder::class,
         ]);
 
-        User::firstOrCreate(
-            ['email' => 'test@example.com'],
-            [
-                'name' => 'Test User',
-                'username' => 'testuser',
-            ]
-        );
+        // User::firstOrCreate(
+        //     ['email' => 'test@example.com'],
+        //     [
+        //         'name' => 'Test User',
+        //         'username' => 'testuser',
+        //     ]
+        // );
     }
 }

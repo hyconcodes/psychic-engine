@@ -22,9 +22,7 @@ class AdminPayoutController extends Controller
             ->latest()
             ->paginate(20);
 
-        $confirmedBalance = AdminBalance::where('status', 'confirmed')
-            ->where('user_id', Auth::id())
-            ->sum('amount');
+        $confirmedBalance = AdminBalance::where('status', 'confirmed')->sum('amount');
 
         $totalPaidOut = AdminPayout::where('user_id', Auth::id())
             ->where('status', 'completed')
@@ -39,9 +37,7 @@ class AdminPayoutController extends Controller
     {
         $payoutAccount = PayoutAccount::where('user_id', Auth::id())->first();
         $banks = [];
-        $confirmedBalance = AdminBalance::where('status', 'confirmed')
-            ->where('user_id', Auth::id())
-            ->sum('amount');
+        $confirmedBalance = AdminBalance::where('status', 'confirmed')->sum('amount');
 
         try {
             $banks = app(BachsServiceInterface::class)->listBanks();
@@ -154,9 +150,7 @@ class AdminPayoutController extends Controller
             return back()->with('toast_message', 'Please add a bank account first.')->with('toast_variant', 'error');
         }
 
-        $confirmedBalance = (float) AdminBalance::where('status', 'confirmed')
-            ->where('user_id', Auth::id())
-            ->sum('amount');
+        $confirmedBalance = (float) AdminBalance::where('status', 'confirmed')->sum('amount');
 
         $amount = (float) $validated['amount'];
 
@@ -227,7 +221,6 @@ class AdminPayoutController extends Controller
         $remaining = $amount;
 
         $balances = AdminBalance::where('status', 'confirmed')
-            ->where('user_id', Auth::id())
             ->orderBy('created_at')
             ->get();
 

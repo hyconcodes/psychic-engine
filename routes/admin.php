@@ -43,6 +43,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::put('prompts/{prompt}', [AdminEarningPromptController::class, 'update'])->name('prompts.update');
     Route::post('prompts/{prompt}/toggle', [AdminEarningPromptController::class, 'toggle'])->name('prompts.toggle');
     Route::delete('prompts/{prompt}', [AdminEarningPromptController::class, 'destroy'])->name('prompts.destroy');
+    Route::get('prompts/bulk-import', [AdminEarningPromptController::class, 'bulkImport'])->name('prompts.bulk-import');
+    Route::post('prompts/bulk-import', [AdminEarningPromptController::class, 'storeBulkImport'])->name('prompts.bulk-import.store');
     Route::get('balances', [AdminBalanceController::class, 'index'])->name('balances.index');
     Route::get('balances/{balance}', [AdminBalanceController::class, 'show'])->name('balances.show');
     Route::post('balances/{balance}/process', [AdminBalanceController::class, 'process'])->name('balances.process');

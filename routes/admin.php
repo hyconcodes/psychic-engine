@@ -44,12 +44,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::post('prompts/{prompt}/toggle', [AdminEarningPromptController::class, 'toggle'])->name('prompts.toggle');
     Route::delete('prompts/{prompt}', [AdminEarningPromptController::class, 'destroy'])->name('prompts.destroy');
     Route::get('balances', [AdminBalanceController::class, 'index'])->name('balances.index');
-    Route::get('balances/create', [AdminBalanceController::class, 'create'])->name('balances.create');
-    Route::post('balances', [AdminBalanceController::class, 'store'])->name('balances.store');
     Route::get('balances/{balance}', [AdminBalanceController::class, 'show'])->name('balances.show');
-    Route::get('balances/{balance}/edit', [AdminBalanceController::class, 'edit'])->name('balances.edit');
-    Route::put('balances/{balance}', [AdminBalanceController::class, 'update'])->name('balances.update');
-    Route::delete('balances/{balance}', [AdminBalanceController::class, 'destroy'])->name('balances.destroy');
     Route::post('balances/{balance}/process', [AdminBalanceController::class, 'process'])->name('balances.process');
 
     Route::get('settings', [AdminSettingsController::class, 'index'])->name('settings.index');
@@ -58,5 +53,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('payouts', [AdminPayoutController::class, 'index'])->name('payouts.index');
     Route::get('payouts/create', [AdminPayoutController::class, 'create'])->name('payouts.create');
     Route::post('payouts/bank', [AdminPayoutController::class, 'storeBank'])->name('payouts.store-bank');
+    Route::get('payouts/bank/edit', [AdminPayoutController::class, 'edit'])->name('payouts.edit-bank');
+    Route::put('payouts/bank', [AdminPayoutController::class, 'updateBank'])->name('payouts.update-bank');
     Route::post('payouts/process', [AdminPayoutController::class, 'process'])->name('payouts.process');
 });

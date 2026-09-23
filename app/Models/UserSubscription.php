@@ -51,6 +51,15 @@ class UserSubscription extends Model
                 $subscription->addAdminBalance();
             }
         });
+
+        static::updated(function (UserSubscription $subscription) {
+            if ($subscription->status === 'active'
+                && $subscription->plan
+                && $subscription->wasChanged('status')
+                && $subscription->getOriginal('status') !== 'active') {
+                $subscription->addAdminBalance();
+            }
+        });
     }
 
     public function addAdminBalance(): void

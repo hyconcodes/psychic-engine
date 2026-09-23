@@ -6,12 +6,8 @@
             </a>
             <div class="flex-1">
                 <h2 class="font-semibold text-xl text-text dark:text-text leading-tight">{{ __('Admin Balance Management') }}</h2>
-                <p class="text-xs text-text/50">{{ __('Track and manage accumulated admin charges') }}</p>
+                <p class="text-xs text-text/50">{{ __('Track accumulated admin charges from plan activations') }}</p>
             </div>
-            <a href="{{ route('admin.balances.create') }}" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-gradient-to-r from-primary to-secondary text-white text-xs font-semibold shadow-md shadow-primary/20 hover:from-primary/90 hover:to-secondary/90 transition-all">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m6-6H6"/></svg>
-                {{ __('Add Balance') }}
-            </a>
             <a href="{{ route('admin.payouts.create') }}" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-green-600 text-white text-xs font-semibold shadow-md hover:bg-green-500 transition-all">
                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg>
                 {{ __('Request Payout') }}
@@ -20,16 +16,16 @@
 
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div class="bg-white dark:bg-neutral-900 rounded-2xl border border-gray-100 dark:border-neutral-800 p-4 shadow-sm">
-                <p class="text-xs text-text/50">{{ __('Total Balance') }}</p>
-                <p class="mt-1 text-2xl font-bold text-text">₦{{ number_format((float) ($stats['total_balance'] ?? 0), 2) }}</p>
+                <p class="text-xs text-text/50">{{ __('Confirmed Balance') }}</p>
+                <p class="mt-1 text-2xl font-bold text-green-600">₦{{ number_format((float) ($stats['total_balance'] ?? 0), 2) }}</p>
             </div>
             <div class="bg-white dark:bg-neutral-900 rounded-2xl border border-gray-100 dark:border-neutral-800 p-4 shadow-sm">
-                <p class="text-xs text-text/50">{{ __('Pending Balance') }}</p>
+                <p class="text-xs text-text/50">{{ __('Pending Confirmation') }}</p>
                 <p class="mt-1 text-2xl font-bold text-yellow-600">₦{{ number_format((float) ($stats['pending_balance'] ?? 0), 2) }}</p>
             </div>
             <div class="bg-white dark:bg-neutral-900 rounded-2xl border border-gray-100 dark:border-neutral-800 p-4 shadow-sm">
-                <p class="text-xs text-text/50">{{ __('Confirmed') }}</p>
-                <p class="mt-1 text-2xl font-bold text-green-600">₦{{ number_format((float) (($stats['total_balance'] ?? 0) - ($stats['pending_balance'] ?? 0)), 2) }}</p>
+                <p class="text-xs text-text/50">{{ __('Total Records') }}</p>
+                <p class="mt-1 text-2xl font-bold text-text">{{ number_format((int) ($stats['total'] ?? 0)) }}</p>
             </div>
         </div>
 
@@ -58,28 +54,24 @@
                                 <td class="px-4 py-3">
                                     @if($balance->status === 'confirmed')
                                         <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">{{ __('Confirmed') }}</span>
+                                    @elseif($balance->status === 'paid_out')
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">{{ __('Paid Out') }}</span>
                                     @else
                                         <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400">{{ __('Pending') }}</span>
                                     @endif
                                 </td>
                                 <td class="px-4 py-3 text-xs text-text/50">{{ $balance->created_at->format('M d, Y') }}</td>
                                 <td class="px-4 py-3 text-right">
-                                    <div class="flex items-center justify-end gap-1.5">
-                                        @if($balance->status === 'pending')
-                                            <form method="post" action="{{ route('admin.balances.process', $balance) }}">
-                                                @csrf
-                                                <button type="submit" class="inline-flex items-center px-2 py-1 rounded-lg text-[11px] font-semibold bg-green-100 text-green-700 hover:bg-green-200 dark:bg-green-900/30 dark:text-green-400 dark:hover:bg-green-900/50 transition-colors">
-                                                    {{ __('Process') }}
-                                                </button>
-                                            </form>
-                                        @endif
-                                        <a href="{{ route('admin.balances.show', $balance) }}" class="inline-flex items-center px-2 py-1 rounded-lg text-[11px] font-semibold bg-gray-100 text-text/60 hover:bg-gray-200 dark:bg-neutral-800 dark:text-text/60 dark:hover:bg-neutral-700 transition-colors">
-                                            {{ __('View') }}
-                                        </a>
-                                        <a href="{{ route('admin.balances.edit', $balance) }}" class="inline-flex items-center px-2 py-1 rounded-lg text-[11px] font-semibold bg-gray-100 text-text/60 hover:bg-gray-200 dark:bg-neutral-800 dark:text-text/60 dark:hover:bg-neutral-700 transition-colors">
-                                            {{ __('Edit') }}
-                                        </a>
-                                    </div>
+                                    @if($balance->status === 'pending')
+                                        <form method="post" action="{{ route('admin.balances.process', $balance) }}" class="inline">
+                                            @csrf
+                                            <button type="submit" class="inline-flex items-center px-2 py-1 rounded-lg text-[11px] font-semibold bg-green-100 text-green-700 hover:bg-green-200 dark:bg-green-900/30 dark:text-green-400 dark:hover:bg-green-900/50 transition-colors">
+                                                {{ __('Confirm') }}
+                                            </button>
+                                        </form>
+                                    @else
+                                        <span class="text-[11px] text-text/30">—</span>
+                                    @endif
                                 </td>
                             </tr>
                         @empty

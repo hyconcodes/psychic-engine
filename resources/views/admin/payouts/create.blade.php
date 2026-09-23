@@ -25,6 +25,10 @@
                     </div>
                 </div>
                 <p class="mt-2 text-[11px] text-text/40">{{ __('Verified and ready for payouts.') }}</p>
+                <a href="{{ route('admin.payouts.edit-bank') }}" class="mt-2 inline-flex items-center gap-1 text-[11px] font-semibold text-primary hover:underline">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg>
+                    {{ __('Change Bank Account') }}
+                </a>
             @else
                 <form method="post" action="{{ route('admin.payouts.store-bank') }}" class="space-y-3">
                     @csrf

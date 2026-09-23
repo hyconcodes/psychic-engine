@@ -88,6 +88,60 @@ class AdminPayoutController extends Controller
         }
     }
 
+    public function edit(): View
+    {
+        $payoutAccount = PayoutAccount::where('user_id', Auth::id())->first();
+
+        $banks = [];
+        try {
+            $banks = app(BachsServiceInterface::class)->listBanks();
+        } catch (\Exception $e) {
+            // Banks list unavailable
+        }
+
+        return view('admin.payouts.edit', compact('payoutAccount', 'banks'));
+    }
+
+    public function updateBank(Request $request, BachsServiceInterface $bachs): RedirectResponse
+    {
+        $validated = $request->validate([
+            'bank_code' => 'required|string',
+            'account_number' => 'required|string|size:10',
+        ]);
+
+        try {
+            $result = $bachs->resolveBankAccount(
+                $validated['account_number'],
+                $validated['bank_code'],
+            );
+
+            $accountName = $result['account_name'] ?? 'Unknown Account';
+
+            $payoutAccount = PayoutAccount::where('user_id', Auth::id())->first();
+
+            if (! $payoutAccount) {
+                return back()->with('toast_message', 'No payout account found.')->with('toast_variant', 'error');
+            }
+
+            $payoutAccount->update([
+                'bank_name' => $result['bank_name'] ?? $validated['bank_code'],
+                'bank_code' => $validated['bank_code'],
+                'account_number' => $validated['account_number'],
+                'account_name' => $accountName,
+                'bachs_destination_id' => null,
+            ]);
+
+            return redirect()->route('admin.payouts.index')
+                ->with('toast_message', 'Bank account updated and re-verified: '.$accountName)
+                ->with('toast_variant', 'success');
+
+        } catch (BachsException $e) {
+            return back()->with('toast_message', 'Bank verification failed: '.$e->getMessage())->with('toast_variant', 'error');
+        } catch (\Exception $e) {
+            return back()->with('toast_message', 'An error occurred while verifying your bank account.')->with('toast_variant', 'error');
+        }
+    }
+
     public function process(Request $request, BachsServiceInterface $bachs): RedirectResponse
     {
         $validated = $request->validate([

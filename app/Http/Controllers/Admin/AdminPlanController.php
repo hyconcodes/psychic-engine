@@ -34,6 +34,8 @@ class AdminPlanController extends Controller
             'is_popular' => 'boolean',
             'is_active' => 'boolean',
             'sort_order' => 'required|integer|min:0',
+            'admin_charge_amount' => 'required|numeric|min:0',
+            'admin_charge_percentage' => 'nullable|numeric|min:0|max:100',
         ]);
 
         $validated['features'] = array_filter($validated['features']);

@@ -21,6 +21,8 @@ class Plan extends Model
         'is_popular',
         'is_active',
         'sort_order',
+        'admin_charge_amount',
+        'admin_charge_percentage',
     ];
 
     protected $casts = [
@@ -31,6 +33,8 @@ class Plan extends Model
         'features' => 'array',
         'is_popular' => 'boolean',
         'is_active' => 'boolean',
+        'admin_charge_amount' => 'decimal:2',
+        'admin_charge_percentage' => 'decimal:2',
     ];
 
     public function subscriptions(): HasMany

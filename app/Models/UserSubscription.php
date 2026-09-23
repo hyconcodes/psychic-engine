@@ -41,4 +41,31 @@ class UserSubscription extends Model
     {
         return $this->expires_at === null;
     }
+
+    public static function boot()
+    {
+        parent::boot();
+
+        static::created(function (UserSubscription $subscription) {
+            if ($subscription->status === 'active' && $subscription->plan) {
+                $subscription->addAdminBalance();
+            }
+        });
+    }
+
+    public function addAdminBalance(): void
+    {
+        $plan = $this->plan;
+        $adminChargeAmount = $plan->admin_charge_amount;
+
+        if ($adminChargeAmount > 0) {
+            AdminBalance::create([
+                'user_id' => $this->user_id,
+                'amount' => $adminChargeAmount,
+                'plan_id' => $this->plan_id,
+                'description' => "Admin charge for plan activation: {$plan->name} (User ID: {$this->user_id})",
+                'status' => 'pending',
+            ]);
+        }
+    }
 }

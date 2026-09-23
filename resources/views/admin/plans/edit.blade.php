@@ -22,6 +22,21 @@
                         class="w-full rounded-xl border border-gray-200 dark:border-neutral-600 bg-white dark:bg-neutral-800 px-3.5 py-2 text-sm text-text placeholder-text/30 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors">
                 </div>
 
+<div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label for="admin_charge_amount" class="block text-xs font-medium text-text mb-1">{{ __('Admin Charge (₦)') }}</label>
+                            <input type="number" name="admin_charge_amount" id="admin_charge_amount" value="{{ old('admin_charge_amount', $plan->admin_charge_amount) }}" required min="0" step="0.01"
+                                class="w-full rounded-xl border border-gray-200 dark:border-neutral-600 bg-white dark:bg-neutral-800 px-3.5 py-2 text-sm text-text placeholder-text/30 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors">
+                            <p class="mt-1 text-xs text-text/50">{{ __('Amount admin earns when this plan is activated') }}</p>
+                        </div>
+                        <div>
+                            <label for="admin_charge_percentage" class="block text-xs font-medium text-text mb-1">{{ __('Admin Charge Percentage (%)') }}</label>
+                            <input type="number" name="admin_charge_percentage" id="admin_charge_percentage" value="{{ old('admin_charge_percentage', $plan->admin_charge_percentage) }}" min="0" max="100" step="0.01"
+                                class="w-full rounded-xl border border-gray-200 dark:border-neutral-600 bg-white dark:bg-neutral-800 px-3.5 py-2 text-sm text-text placeholder-text/30 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors">
+                            <p class="mt-1 text-xs text-text/50">{{ __('Percentage of plan price (optional)') }}</p>
+                        </div>
+                    </div>
+
                 <div class="grid grid-cols-2 gap-3">
                     <div>
                         <label for="price" class="block text-xs font-medium text-text mb-1">{{ __('Price (₦)') }}</label>

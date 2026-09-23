@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\AdminBalance;
+use App\Models\AdminPayout;
 use App\Models\ContactMessage;
 use App\Models\Transaction;
 use App\Models\User;
@@ -48,6 +50,11 @@ class AdminDashboardController extends Controller
 
         $totalAffiliateCommissions = DB::table('affiliate_commissions')->sum('amount');
 
+        $totalAdminEarned = AdminBalance::sum('amount');
+        $adminConfirmedBalance = AdminBalance::where('status', 'confirmed')->sum('amount');
+        $adminPendingBalance = AdminBalance::where('status', 'pending')->sum('amount');
+        $totalAdminPaidOut = AdminPayout::where('status', 'completed')->sum('amount');
+
         $recentTransactions = Transaction::with('user')
             ->latest()
             ->take(10)
@@ -75,6 +82,10 @@ class AdminDashboardController extends Controller
             'thisMonthWithdrawals',
             'totalWalletBalance',
             'totalAffiliateCommissions',
+            'totalAdminEarned',
+            'adminConfirmedBalance',
+            'adminPendingBalance',
+            'totalAdminPaidOut',
             'recentTransactions',
             'pendingWithdrawalList',
             'recentUsers',

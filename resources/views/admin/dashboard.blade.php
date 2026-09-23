@@ -94,6 +94,35 @@
             </div>
         </div>
 
+        {{-- Admin Earnings --}}
+        <div class="bg-white dark:bg-neutral-900 rounded-xl border border-gray-100 dark:border-neutral-800 p-4 shadow-sm">
+            <div class="flex items-center justify-between mb-3">
+                <h3 class="text-xs font-semibold text-text">Admin Earnings</h3>
+                <a href="{{ route('admin.payouts.index') }}" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-primary/10 text-primary text-[10px] font-semibold hover:bg-primary/20 transition-colors">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg>
+                    Withdraw
+                </a>
+            </div>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <div class="text-center p-2 rounded-lg bg-gray-50 dark:bg-neutral-800">
+                    <p class="text-[9px] text-text/40 mb-0.5">Total Earned</p>
+                    <p class="text-sm font-bold text-text" style="font-family: 'DM Serif Display', Georgia, serif;">₦{{ number_format((float) $totalAdminEarned, 2) }}</p>
+                </div>
+                <div class="text-center p-2 rounded-lg bg-green-50 dark:bg-green-900/20">
+                    <p class="text-[9px] text-green-600 mb-0.5">Available to Withdraw</p>
+                    <p class="text-sm font-bold text-green-600" style="font-family: 'DM Serif Display', Georgia, serif;">₦{{ number_format((float) $adminConfirmedBalance, 2) }}</p>
+                </div>
+                <div class="text-center p-2 rounded-lg bg-gray-50 dark:bg-neutral-800">
+                    <p class="text-[9px] text-text/40 mb-0.5">Total Withdrawn</p>
+                    <p class="text-sm font-bold text-text" style="font-family: 'DM Serif Display', Georgia, serif;">₦{{ number_format((float) $totalAdminPaidOut, 2) }}</p>
+                </div>
+                <div class="text-center p-2 rounded-lg bg-amber-50 dark:bg-amber-900/20">
+                    <p class="text-[9px] text-amber-600 mb-0.5">Pending Confirmation</p>
+                    <p class="text-sm font-bold text-amber-600" style="font-family: 'DM Serif Display', Georgia, serif;">₦{{ number_format((float) $adminPendingBalance, 2) }}</p>
+                </div>
+            </div>
+        </div>
+
         {{-- Quick Actions --}}
         <div class="grid grid-cols-3 gap-2">
             <a href="{{ route('admin.withdrawals.index') }}" class="bg-white dark:bg-neutral-900 rounded-xl border border-gray-100 dark:border-neutral-800 p-3 shadow-sm hover:border-amber-300 transition-colors text-center">

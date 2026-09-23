@@ -15,25 +15,38 @@
             <x-refresh-button />
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             <div class="bg-white dark:bg-neutral-900 rounded-2xl border border-gray-100 dark:border-neutral-800 p-4 shadow-sm">
-                <p class="text-xs text-text/50">{{ __('Confirmed Balance') }}</p>
+                <p class="text-xs text-text/50">{{ __('Total Earned') }}</p>
+                <p class="mt-1 text-2xl font-bold text-text">₦{{ number_format((float) $totalEarned, 2) }}</p>
+                <p class="text-[10px] text-text/30 mt-0.5">{{ __('All admin charges') }}</p>
+            </div>
+            <div class="bg-white dark:bg-neutral-900 rounded-2xl border border-green-200 dark:border-green-800 p-4 shadow-sm">
+                <p class="text-xs text-green-600">{{ __('Available to Withdraw') }}</p>
                 <p class="mt-1 text-2xl font-bold text-green-600">₦{{ number_format((float) $confirmedBalance, 2) }}</p>
+                <p class="text-[10px] text-green-500/70 mt-0.5">{{ __('Confirmed balance') }}</p>
             </div>
             <div class="bg-white dark:bg-neutral-900 rounded-2xl border border-gray-100 dark:border-neutral-800 p-4 shadow-sm">
-                <p class="text-xs text-text/50">{{ __('Total Paid Out') }}</p>
+                <p class="text-xs text-text/50">{{ __('Total Withdrawn') }}</p>
                 <p class="mt-1 text-2xl font-bold text-text">₦{{ number_format((float) $totalPaidOut, 2) }}</p>
+                <p class="text-[10px] text-text/30 mt-0.5">{{ __('Completed payouts') }}</p>
             </div>
-            <div class="bg-white dark:bg-neutral-900 rounded-2xl border border-gray-100 dark:border-neutral-800 p-4 shadow-sm">
-                <p class="text-xs text-text/50">{{ __('Bank Account') }}</p>
-                @if($payoutAccount)
-                    <p class="mt-1 text-sm font-medium text-text">{{ $payoutAccount->bank_name }}</p>
-                    <p class="text-[11px] text-text/40">{{ $payoutAccount->account_number }} — {{ $payoutAccount->account_name }}</p>
-                @else
-                    <p class="mt-1 text-sm text-yellow-600">{{ __('No bank account linked') }}</p>
-                    <a href="{{ route('admin.payouts.create') }}" class="text-[11px] text-primary hover:underline">{{ __('Add one now') }}</a>
-                @endif
+            <div class="bg-white dark:bg-neutral-900 rounded-2xl border border-amber-200 dark:border-amber-800 p-4 shadow-sm">
+                <p class="text-xs text-amber-600">{{ __('Pending Confirmation') }}</p>
+                <p class="mt-1 text-2xl font-bold text-amber-600">₦{{ number_format((float) $pendingBalance, 2) }}</p>
+                <p class="text-[10px] text-amber-500/70 mt-0.5">{{ __('Awaiting admin action') }}</p>
             </div>
+        </div>
+
+        <div class="bg-white dark:bg-neutral-900 rounded-2xl border border-gray-100 dark:border-neutral-800 p-4 shadow-sm">
+            <p class="text-xs text-text/50">{{ __('Bank Account') }}</p>
+            @if($payoutAccount)
+                <p class="mt-1 text-sm font-medium text-text">{{ $payoutAccount->bank_name }}</p>
+                <p class="text-[11px] text-text/40">{{ $payoutAccount->account_number }} — {{ $payoutAccount->account_name }}</p>
+            @else
+                <p class="mt-1 text-sm text-yellow-600">{{ __('No bank account linked') }}</p>
+                <a href="{{ route('admin.payouts.create') }}" class="text-[11px] text-primary hover:underline">{{ __('Add one now') }}</a>
+            @endif
         </div>
 
         <div class="bg-white dark:bg-neutral-900 rounded-2xl border border-gray-100 dark:border-neutral-800 shadow-sm overflow-hidden">

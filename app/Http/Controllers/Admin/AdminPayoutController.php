@@ -28,9 +28,12 @@ class AdminPayoutController extends Controller
             ->where('status', 'completed')
             ->sum('amount');
 
+        $totalEarned = AdminBalance::sum('amount');
+        $pendingBalance = AdminBalance::where('status', 'pending')->sum('amount');
+
         $payoutAccount = PayoutAccount::where('user_id', Auth::id())->first();
 
-        return view('admin.payouts.index', compact('payouts', 'confirmedBalance', 'totalPaidOut', 'payoutAccount'));
+        return view('admin.payouts.index', compact('payouts', 'confirmedBalance', 'totalPaidOut', 'totalEarned', 'pendingBalance', 'payoutAccount'));
     }
 
     public function create(): View

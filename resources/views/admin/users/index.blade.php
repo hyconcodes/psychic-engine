@@ -9,6 +9,7 @@
                     <h2 class="font-semibold text-lg text-text leading-tight">{{ __('User Management') }}</h2>
                     <p class="text-[10px] text-text/40">View and manage all users</p>
                 </div>
+                <x-refresh-button />
             </div>
         </div>
 

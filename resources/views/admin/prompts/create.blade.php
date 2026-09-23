@@ -9,6 +9,7 @@
                 <h2 class="font-semibold text-xl text-text dark:text-text leading-tight">{{ __('Add Earning Prompt') }}</h2>
                 <p class="text-xs text-text/50">{{ __('Create a new voice earn or word game prompt') }}</p>
             </div>
+            <x-refresh-button />
         </div>
 
         <form method="POST" action="{{ route('admin.prompts.store') }}">

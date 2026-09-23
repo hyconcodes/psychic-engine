@@ -9,6 +9,7 @@
                 <h2 class="font-semibold text-xl text-text dark:text-text leading-tight">{{ __('Bulk Import Prompts') }}</h2>
                 <p class="text-xs text-text/50">{{ __('Import multiple prompts from a CSV file (one prompt per line)') }}</p>
             </div>
+            <x-refresh-button />
         </div>
 
         <form method="POST" action="{{ route('admin.prompts.bulk-import.store') }}" enctype="multipart/form-data">

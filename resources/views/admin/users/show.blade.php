@@ -21,6 +21,7 @@
                     </form>
                 @endif
             </div>
+            <x-refresh-button />
         </div>
 
         {{-- Profile Card --}}

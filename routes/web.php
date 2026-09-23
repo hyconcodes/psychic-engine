@@ -20,16 +20,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('plans/callback', [PlanController::class, 'callback'])->name('plans.callback');
     Route::get('plans/cancelled', [PlanController::class, 'cancelled'])->name('plans.cancelled');
 
-    Route::get('transactions', [TransactionController::class, 'index'])->name('transactions.index');
-
     Route::livewire('earn', 'pages::earn.index')->name('earn.index');
     Route::livewire('earn/voice', 'pages::earn.record')->name('earn.voice')->defaults('type', 'sentence');
     Route::livewire('earn/word-game', 'pages::earn.record')->name('earn.word-game')->defaults('type', 'word');
 
-    Route::livewire('withdraw', 'pages::withdraw')->name('withdraw.index');
+    Route::middleware('has-plan')->group(function () {
+        Route::get('transactions', [TransactionController::class, 'index'])->name('transactions.index');
 
-    Route::livewire('affiliate', 'pages::affiliate')->name('affiliate.index');
-    Route::livewire('affiliate/earners', 'pages::affiliate.earners')->name('affiliate.earners');
+        Route::livewire('withdraw', 'pages::withdraw')->name('withdraw.index');
+
+        Route::livewire('affiliate', 'pages::affiliate')->name('affiliate.index');
+        Route::livewire('affiliate/earners', 'pages::affiliate.earners')->name('affiliate.earners');
+    });
 });
 
 require __DIR__.'/settings.php';

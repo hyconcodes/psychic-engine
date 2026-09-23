@@ -9,6 +9,7 @@
                 <h2 class="font-semibold text-xl text-text dark:text-text leading-tight">{{ __('Edit Earning Prompt') }}</h2>
                 <p class="text-xs text-text/50">{{ $prompt->text }}</p>
             </div>
+            <x-refresh-button />
         </div>
 
         <form method="POST" action="{{ route('admin.prompts.update', $prompt) }}">

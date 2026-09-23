@@ -8,6 +8,7 @@
                 <h2 class="font-semibold text-xl text-text dark:text-text leading-tight">{{ __('Request Payout') }}</h2>
                 <p class="text-xs text-text/50">{{ __('Available: ₦'.number_format((float) $confirmedBalance, 2)) }}</p>
             </div>
+            <x-refresh-button />
         </div>
 
         {{-- Step 1: Bank Account --}}

@@ -8,6 +8,7 @@
                 <h2 class="font-semibold text-lg text-text leading-tight">{{ __('Contact Messages') }}</h2>
                 <p class="text-[10px] text-text/40">{{ $stats['unread'] }} unread of {{ $stats['total'] }} total</p>
             </div>
+            <x-refresh-button />
         </div>
 
         <div class="grid grid-cols-3 gap-2">

@@ -8,6 +8,7 @@
                 <h2 class="font-semibold text-xl text-text dark:text-text leading-tight">{{ __('Withdrawal Review') }}</h2>
                 <p class="text-xs text-text/50">{{ __('Review and approve task withdrawal requests') }}</p>
             </div>
+            <x-refresh-button />
         </div>
 
         <div class="bg-white dark:bg-neutral-900 rounded-2xl border border-gray-100 dark:border-neutral-800 shadow-sm overflow-hidden">

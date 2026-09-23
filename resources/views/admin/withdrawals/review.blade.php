@@ -9,6 +9,7 @@
                 <h2 class="font-semibold text-xl text-text dark:text-text leading-tight">{{ __('Review Withdrawal') }}</h2>
                 <p class="text-xs text-text/50">{{ $withdrawal->user->name }} ({{ '@'.$withdrawal->user->username }})</p>
             </div>
+            <x-refresh-button />
         </div>
 
         {{-- Summary card --}}

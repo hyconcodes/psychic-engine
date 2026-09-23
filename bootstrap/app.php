@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Webhook\BachsWebhookController;
 use App\Http\Middleware\AdminMiddleware;
+use App\Http\Middleware\EnsureUserHasPlan;
 use App\Http\Middleware\EnsureUserIsNotBanned;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -29,6 +30,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->alias([
             'admin' => AdminMiddleware::class,
+            'has-plan' => EnsureUserHasPlan::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

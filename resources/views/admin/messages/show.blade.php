@@ -13,6 +13,7 @@
                 @method('DELETE')
                 <button type="submit" onclick="return confirm('Delete this message?')" class="px-2.5 py-1.5 rounded-lg bg-red-500/10 text-red-600 text-[10px] font-medium hover:bg-red-500/20 transition-colors">Delete</button>
             </form>
+            <x-refresh-button />
         </div>
 
         {{-- Original Message --}}

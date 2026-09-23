@@ -312,5 +312,121 @@
                 </a>
             </div>
         </div>
+
+        {{-- Report an Issue --}}
+        <div class="text-center pt-2 pb-1" x-data="{ reportOpen: false }">
+            <button type="button" @click="reportOpen = true" class="text-[11px] text-text/30 hover:text-primary transition-colors cursor-pointer">
+                {{ __('Report an issue') }}
+            </button>
+
+            {{-- Report Modal --}}
+            <div x-show="reportOpen" x-cloak
+                x-transition:enter="ease-out duration-200"
+                x-transition:enter-start="opacity-0"
+                x-transition:enter-end="opacity-100"
+                x-transition:leave="ease-in duration-150"
+                x-transition:leave-start="opacity-100"
+                x-transition:leave-end="opacity-0"
+                class="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4"
+                @keydown.escape.window="reportOpen = false">
+                <div class="fixed inset-0 bg-black/40 backdrop-blur-sm" @click="reportOpen = false"></div>
+                <div class="relative w-full sm:max-w-md bg-white dark:bg-neutral-900 rounded-t-2xl sm:rounded-2xl border border-gray-100 dark:border-neutral-800 shadow-2xl max-h-[85vh] overflow-y-auto"
+                    x-transition:enter="ease-out duration-200"
+                    x-transition:enter-start="translate-y-4 sm:translate-y-0 sm:scale-95 opacity-0"
+                    x-transition:enter-end="translate-y-0 sm:scale-100 opacity-100"
+                    x-transition:leave="ease-in duration-150"
+                    x-transition:leave-start="translate-y-0 sm:scale-100 opacity-100"
+                    x-transition:leave-end="translate-y-4 sm:translate-y-0 sm:scale-95 opacity-0">
+                    <div class="p-5">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-sm font-semibold text-text">{{ __('Report an issue') }}</h3>
+                            <button type="button" @click="reportOpen = false" class="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-gray-100 dark:hover:bg-neutral-800 transition-colors cursor-pointer">
+                                <svg class="w-4 h-4 text-text/40" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                            </button>
+                        </div>
+                        <form action="{{ route('contact.store') }}" method="POST" class="space-y-3" x-data="{ sending: false }" @submit.prevent="
+                            sending = true;
+                            const formData = new FormData($el);
+                            fetch('{{ route('contact.store') }}', {
+                                method: 'POST',
+                                body: formData,
+                                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                            }).then(r => r.ok ? r.text() : Promise.reject(r))
+                              .then(() => {
+                                reportOpen = false;
+                                $flux.toast('{{ __('Your report has been sent. We will get back to you shortly.') }}', { variant: 'success' });
+                                $el.reset();
+                              }).catch(() => {
+                                $flux.toast('{{ __('Something went wrong. Please try again.') }}', { variant: 'danger' });
+                              }).finally(() => { sending = false; });
+                        ">
+                            @csrf
+                            <input type="hidden" name="name" value="{{ $user->name }}">
+                            <input type="hidden" name="email" value="{{ $user->email }}">
+                            <div>
+                                <label for="report-subject" class="block text-[11px] font-medium text-text/60 mb-1">{{ __('Subject') }}</label>
+                                <input type="text" name="subject" id="report-subject" required maxlength="255"
+                                    class="w-full rounded-xl border border-gray-200 dark:border-neutral-600 bg-white dark:bg-neutral-800 px-3.5 py-2 text-sm text-text placeholder-text/30 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors"
+                                    placeholder="{{ __('Brief description of the issue') }}">
+                            </div>
+                            <div>
+                                <label for="report-message" class="block text-[11px] font-medium text-text/60 mb-1">{{ __('Message') }}</label>
+                                <textarea name="message" id="report-message" rows="4" required maxlength="5000"
+                                    class="w-full rounded-xl border border-gray-200 dark:border-neutral-600 bg-white dark:bg-neutral-800 px-3.5 py-2 text-sm text-text placeholder-text/30 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors resize-none"
+                                    placeholder="{{ __('Describe what happened...') }}"></textarea>
+                            </div>
+                            <button type="submit" :disabled="sending"
+                                class="w-full py-2.5 rounded-xl bg-gradient-to-r from-primary to-secondary text-white text-xs font-semibold shadow-md shadow-primary/20 hover:from-primary/90 hover:to-secondary/90 transition-all disabled:opacity-50 cursor-pointer flex items-center justify-center gap-1.5">
+                                <template x-if="!sending">
+                                    <span>{{ __('Send Report') }}</span>
+                                </template>
+                                <template x-if="sending">
+                                    <span class="flex items-center gap-1.5">
+                                        <svg class="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/></svg>
+                                        {{ __('Sending...') }}
+                                    </span>
+                                </template>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {{-- Avatar Theme Toggle --}}
+        <div class="fixed bottom-20 right-4 sm:bottom-6 sm:right-6 z-40" x-data="{ themeOpen: false }">
+            <button type="button" @click="themeOpen = !themeOpen"
+                class="w-11 h-11 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center text-white text-sm font-bold shadow-lg shadow-primary/30 ring-2 ring-white dark:ring-neutral-900 cursor-pointer hover:scale-105 transition-transform">
+                {{ $user->initials() }}
+            </button>
+            <div x-show="themeOpen" x-cloak
+                x-transition:enter="ease-out duration-150"
+                x-transition:enter-start="opacity-0 scale-90 translate-y-2"
+                x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+                x-transition:leave="ease-in duration-100"
+                x-transition:leave-start="opacity-100 scale-100"
+                x-transition:leave-end="opacity-0 scale-90"
+                @click.outside="themeOpen = false"
+                class="absolute bottom-14 right-0 w-40 bg-white dark:bg-neutral-900 rounded-xl border border-gray-100 dark:border-neutral-800 shadow-xl p-1.5">
+                <button type="button" @click="$flux.appearance = 'light'; themeOpen = false"
+                    class="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition-colors cursor-pointer"
+                    :class="$flux.appearance === 'light' || ($flux.appearance === 'system' && !window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'bg-primary/10 text-primary' : 'text-text/60 hover:bg-gray-100 dark:hover:bg-neutral-800'">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z"/></svg>
+                    {{ __('Light') }}
+                </button>
+                <button type="button" @click="$flux.appearance = 'dark'; themeOpen = false"
+                    class="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition-colors cursor-pointer"
+                    :class="$flux.appearance === 'dark' || ($flux.appearance === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'bg-primary/10 text-primary' : 'text-text/60 hover:bg-gray-100 dark:hover:bg-neutral-800'">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z"/></svg>
+                    {{ __('Dark') }}
+                </button>
+                <button type="button" @click="$flux.appearance = 'system'; themeOpen = false"
+                    class="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition-colors cursor-pointer"
+                    :class="$flux.appearance === 'system' ? 'bg-primary/10 text-primary' : 'text-text/60 hover:bg-gray-100 dark:hover:bg-neutral-800'">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17.25v1.007a3 3 0 01-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0115 18.257V17.25m6-12V15a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 15V5.25m18 0A2.25 2.25 0 0018.75 3H5.25A2.25 2.25 0 003 5.25m18 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 7.41A2.25 2.25 0 012.25 5.496V5.25"/></svg>
+                    {{ __('System') }}
+                </button>
+            </div>
+        </div>
     </div>
 </x-layouts::app>

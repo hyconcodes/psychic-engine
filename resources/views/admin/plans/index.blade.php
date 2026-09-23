@@ -9,6 +9,7 @@
                 <h2 class="font-semibold text-xl text-text dark:text-text leading-tight">{{ __('Plan Management') }}</h2>
                 <p class="text-xs text-text/50">{{ __('Manage subscription plans and earning rates') }}</p>
             </div>
+            <x-refresh-button />
         </div>
 
         <div class="bg-white dark:bg-neutral-900 rounded-2xl border border-gray-100 dark:border-neutral-800 shadow-sm overflow-hidden">

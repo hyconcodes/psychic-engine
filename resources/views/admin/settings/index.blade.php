@@ -8,6 +8,7 @@
                 <h2 class="font-semibold text-xl text-text dark:text-text leading-tight">{{ __('Community Group Settings') }}</h2>
                 <p class="text-xs text-text/50">{{ __('Set the WhatsApp or Telegram group link shown in the sidebar') }}</p>
             </div>
+            <x-refresh-button />
         </div>
 
         <div class="bg-white dark:bg-neutral-900 rounded-2xl border border-gray-100 dark:border-neutral-800 p-5 shadow-sm">

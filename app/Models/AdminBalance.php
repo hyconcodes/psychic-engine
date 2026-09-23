@@ -44,4 +44,14 @@ class AdminBalance extends Model
     {
         return $query->where('status', 'confirmed');
     }
+
+    public function scopePaidOut($query)
+    {
+        return $query->where('status', 'paid_out');
+    }
+
+    public function scopeAvailable($query)
+    {
+        return $query->where('status', 'confirmed');
+    }
 }

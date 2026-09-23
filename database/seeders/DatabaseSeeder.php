@@ -20,7 +20,7 @@ class DatabaseSeeder extends Seeder
             PlanSeeder::class,
             EarningPromptSeeder::class,
             BulkEarningPromptSeeder::class,
-            AffiliateCommissionSeeder::class,
+            // AffiliateCommissionSeeder::class,
         ]);
 
         User::firstOrCreate(

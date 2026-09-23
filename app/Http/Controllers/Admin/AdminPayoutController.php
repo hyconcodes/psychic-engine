@@ -174,7 +174,7 @@ class AdminPayoutController extends Controller
 
         $balances = AdminBalance::where('status', 'confirmed')
             ->where('user_id', Auth::id())
-            ->orderBy('processed_at')
+            ->orderBy('created_at')
             ->get();
 
         foreach ($balances as $balance) {
@@ -182,8 +182,8 @@ class AdminPayoutController extends Controller
                 break;
             }
 
-            $balanceAmount = (float) $balance->amount;
-            $remaining -= $balanceAmount;
+            $balance->update(['status' => 'paid_out']);
+            $remaining -= (float) $balance->amount;
         }
     }
 }

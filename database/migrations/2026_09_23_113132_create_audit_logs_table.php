@@ -16,8 +16,8 @@ return new class extends Migration
             $table->string('auditable_type');
             $table->unsignedBigInteger('auditable_id');
             $table->string('event');
-            $table->json('old_values')->default('[]');
-            $table->json('new_values')->default('[]');
+            $table->json('old_values');
+            $table->json('new_values');
             $table->string('description');
             $table->unsignedBigInteger('user_id')->nullable();
             $table->string('ip_address')->nullable();

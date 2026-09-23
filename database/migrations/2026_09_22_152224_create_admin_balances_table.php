@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->decimal('amount', 10, 2);
-            $table->foreignId('plan_id')->constrained()->onDelete('set null');
+            $table->foreignId('plan_id')->nullable()->constrained()->onDelete('set null');
             $table->text('description');
             $table->enum('status', ['pending', 'confirmed'])->default('pending');
             $table->timestamp('processed_at')->nullable();

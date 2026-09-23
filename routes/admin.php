@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\AdminAuditLogController;
 use App\Http\Controllers\Admin\AdminBalanceController;
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\AdminEarningPromptController;
@@ -32,9 +33,9 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('withdrawals', [AdminWithdrawalController::class, 'index'])->name('withdrawals.index');
     Route::get('withdrawals/audio/{submission}', [AdminWithdrawalController::class, 'audio'])->name('withdrawals.audio');
     Route::get('withdrawals/{withdrawal}', [AdminWithdrawalController::class, 'show'])->name('withdrawals.review');
-    Route::post('withdrawals/{withdrawal}/approve', [AdminWithdrawalController::class, 'approve'])->name('withdrawals.approve');
-    Route::post('withdrawals/{withdrawal}/deduct', [AdminWithdrawalController::class, 'deduct'])->name('withdrawals.deduct');
-    Route::post('withdrawals/{withdrawal}/decline', [AdminWithdrawalController::class, 'decline'])->name('withdrawals.decline');
+    Route::post('withdrawals/{withdrawal}/approve', [AdminWithdrawalController::class, 'approve'])->name('withdrawals.approve')->middleware('throttle:admin-finance');
+    Route::post('withdrawals/{withdrawal}/deduct', [AdminWithdrawalController::class, 'deduct'])->name('withdrawals.deduct')->middleware('throttle:admin-finance');
+    Route::post('withdrawals/{withdrawal}/decline', [AdminWithdrawalController::class, 'decline'])->name('withdrawals.decline')->middleware('throttle:admin-finance');
 
     Route::get('prompts', [AdminEarningPromptController::class, 'index'])->name('prompts.index');
     Route::get('prompts/create', [AdminEarningPromptController::class, 'create'])->name('prompts.create');
@@ -47,15 +48,17 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::post('prompts/bulk-import', [AdminEarningPromptController::class, 'storeBulkImport'])->name('prompts.bulk-import.store');
     Route::get('balances', [AdminBalanceController::class, 'index'])->name('balances.index');
     Route::get('balances/{balance}', [AdminBalanceController::class, 'show'])->name('balances.show');
-    Route::post('balances/{balance}/process', [AdminBalanceController::class, 'process'])->name('balances.process');
+    Route::post('balances/{balance}/process', [AdminBalanceController::class, 'process'])->name('balances.process')->middleware('throttle:admin-finance');
 
     Route::get('settings', [AdminSettingsController::class, 'index'])->name('settings.index');
     Route::put('settings', [AdminSettingsController::class, 'update'])->name('settings.update');
 
     Route::get('payouts', [AdminPayoutController::class, 'index'])->name('payouts.index');
     Route::get('payouts/create', [AdminPayoutController::class, 'create'])->name('payouts.create');
-    Route::post('payouts/bank', [AdminPayoutController::class, 'storeBank'])->name('payouts.store-bank');
+    Route::post('payouts/bank', [AdminPayoutController::class, 'storeBank'])->name('payouts.store-bank')->middleware('throttle:bank-verify');
     Route::get('payouts/bank/edit', [AdminPayoutController::class, 'edit'])->name('payouts.edit-bank');
-    Route::put('payouts/bank', [AdminPayoutController::class, 'updateBank'])->name('payouts.update-bank');
-    Route::post('payouts/process', [AdminPayoutController::class, 'process'])->name('payouts.process');
+    Route::put('payouts/bank', [AdminPayoutController::class, 'updateBank'])->name('payouts.update-bank')->middleware('throttle:bank-verify');
+    Route::post('payouts/process', [AdminPayoutController::class, 'process'])->name('payouts.process')->middleware('throttle:admin-finance');
+
+    Route::get('audit-logs', [AdminAuditLogController::class, 'index'])->name('audit-logs.index');
 });

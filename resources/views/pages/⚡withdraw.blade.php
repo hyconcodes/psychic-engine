@@ -6,6 +6,7 @@ use App\Models\EarningSubmission;
 use App\Models\Transaction;
 use Flux\Flux;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\RateLimiter;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 
@@ -77,6 +78,16 @@ new #[Title('Withdraw')] class extends Component {
 
     public function withdraw(WithdrawEarnings $withdraw): void
     {
+        $throttleKey = 'withdraw-'.Auth::id();
+        if (RateLimiter::tooManyAttempts($throttleKey, 3)) {
+            $seconds = RateLimiter::availableIn($throttleKey);
+            Flux::toast(variant: 'error', text: __('Please wait :seconds seconds before trying again.', ['seconds' => $seconds]));
+            $this->password = '';
+
+            return;
+        }
+        RateLimiter::hit($throttleKey, 60);
+
         $this->validate([
             'password' => ['required', 'current_password'],
         ]);
@@ -98,6 +109,16 @@ new #[Title('Withdraw')] class extends Component {
 
     public function withdrawAffiliate(WithdrawAffiliateCommission $withdraw): void
     {
+        $throttleKey = 'withdraw-affiliate-'.Auth::id();
+        if (RateLimiter::tooManyAttempts($throttleKey, 3)) {
+            $seconds = RateLimiter::availableIn($throttleKey);
+            Flux::toast(variant: 'error', text: __('Please wait :seconds seconds before trying again.', ['seconds' => $seconds]));
+            $this->affiliatePassword = '';
+
+            return;
+        }
+        RateLimiter::hit($throttleKey, 60);
+
         $this->validate([
             'affiliatePassword' => ['required', 'current_password'],
         ]);

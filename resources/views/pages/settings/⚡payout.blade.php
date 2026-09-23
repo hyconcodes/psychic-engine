@@ -4,6 +4,7 @@ use App\Models\PayoutAccount;
 use App\Services\Bachs\Contracts\BachsServiceInterface;
 use Flux\Flux;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\RateLimiter;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 
@@ -50,6 +51,14 @@ new #[Title('Payout account settings')] class extends Component {
 
     public function verify(BachsServiceInterface $bachs): void
     {
+        $throttleKey = 'bank-verify-'.Auth::id();
+        if (RateLimiter::tooManyAttempts($throttleKey, 10)) {
+            Flux::toast(variant: 'error', text: __('Too many verification attempts. Please wait a moment.'));
+
+            return;
+        }
+        RateLimiter::hit($throttleKey, 60);
+
         $this->validate([
             'bankCode' => ['required'],
             'accountNumber' => ['required', 'digits:10'],

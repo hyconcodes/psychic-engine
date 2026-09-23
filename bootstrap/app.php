@@ -20,6 +20,7 @@ return Application::configure(basePath: dirname(__DIR__))
                 ->group(base_path('routes/admin.php'));
 
             Route::post('webhooks/bachs', [BachsWebhookController::class, 'handle'])
+                ->middleware('throttle:webhook')
                 ->name('webhooks.bachs');
         },
     )

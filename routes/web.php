@@ -16,8 +16,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::view('dashboard', 'dashboard')->name('dashboard');
 
     Route::get('plans', [PlanController::class, 'index'])->name('plans.index');
-    Route::post('plans/{plan:slug}/subscribe', [PlanController::class, 'subscribe'])->name('plans.subscribe');
-    Route::get('plans/callback', [PlanController::class, 'callback'])->name('plans.callback');
+    Route::post('plans/{plan:slug}/subscribe', [PlanController::class, 'subscribe'])->name('plans.subscribe')->middleware('throttle:payment-subscribe');
+    Route::get('plans/callback', [PlanController::class, 'callback'])->name('plans.callback')->middleware('throttle:payment-callback');
     Route::get('plans/cancelled', [PlanController::class, 'cancelled'])->name('plans.cancelled');
 
     Route::livewire('earn', 'pages::earn.index')->name('earn.index');
@@ -27,7 +27,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::middleware('has-plan')->group(function () {
         Route::get('transactions', [TransactionController::class, 'index'])->name('transactions.index');
 
-        Route::livewire('withdraw', 'pages::withdraw')->name('withdraw.index');
+        Route::livewire('withdraw', 'pages::withdraw')->name('withdraw.index')->middleware('throttle:user-withdraw');
 
         Route::livewire('affiliate', 'pages::affiliate')->name('affiliate.index');
         Route::livewire('affiliate/earners', 'pages::affiliate.earners')->name('affiliate.earners');

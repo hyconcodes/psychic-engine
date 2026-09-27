@@ -17,3 +17,14 @@ test('authenticated users can visit the dashboard', function () {
     $response = $this->get(route('dashboard'));
     $response->assertOk();
 });
+
+test('users without an active plan are redirected with a visible toast message', function () {
+    $user = User::factory()->create();
+    $this->actingAs($user);
+
+    $response = $this->get(route('transactions.index'));
+
+    $response->assertRedirect(route('plans.index'));
+    $response->assertSessionHas('toast_message', 'Please activate a plan to access this feature.');
+    $response->assertSessionHas('toast_variant', 'warning');
+});

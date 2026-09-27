@@ -179,8 +179,47 @@
 
             <flux:spacer />
 
-            <div class="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center text-primary text-xs font-bold">
-                {{ auth()->user()->initials() }}
+            <div class="relative" x-data="{ mobileMenuOpen: false }">
+                <button type="button" @click="mobileMenuOpen = !mobileMenuOpen" @click.outside="mobileMenuOpen = false" class="w-8 h-8 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center text-white text-[11px] font-bold shadow-sm ring-2 ring-white dark:ring-neutral-900 cursor-pointer focus:outline-none">
+                    {{ auth()->user()->initials() }}
+                </button>
+
+                <div x-show="mobileMenuOpen" x-cloak x-transition:enter="transition ease-out duration-150" x-transition:enter-start="opacity-0 scale-95 translate-y-2" x-transition:enter-end="opacity-100 scale-100 translate-y-0" x-transition:leave="transition ease-in duration-100" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95 translate-y-1" class="absolute right-0 top-11 w-60 rounded-2xl border border-gray-200 bg-white p-2 shadow-xl dark:border-neutral-800 dark:bg-neutral-900">
+                    <div class="mb-2 flex items-center gap-2 rounded-xl bg-gray-50 px-3 py-2 dark:bg-neutral-800">
+                        <div class="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-primary to-secondary text-[10px] font-bold text-white">
+                            {{ auth()->user()->initials() }}
+                        </div>
+                        <div class="min-w-0">
+                            <p class="truncate text-xs font-semibold text-text">{{ auth()->user()->name }}</p>
+                            <p class="truncate text-[10px] text-text/50">{{ auth()->user()->email }}</p>
+                        </div>
+                    </div>
+
+                    <button type="button" @click="$flux.appearance = ($flux.appearance === 'dark' || ($flux.appearance === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)) ? 'light' : 'dark'; mobileMenuOpen = false" class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs font-medium text-text/70 transition-colors hover:bg-gray-100 dark:hover:bg-neutral-800">
+                        <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z"/></svg>
+                        <span x-text="($flux.appearance === 'light' || ($flux.appearance === 'system' && !window.matchMedia('(prefers-color-scheme: dark)').matches)) ? '{{ __('Switch to Dark') }}' : '{{ __('Switch to Light') }}'"></span>
+                    </button>
+
+                    <a href="{{ route('profile.edit') }}" wire:navigate @click="mobileMenuOpen = false" class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs font-medium text-text/70 transition-colors hover:bg-gray-100 dark:hover:bg-neutral-800">
+                        <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                        {{ __('Settings') }}
+                    </a>
+
+                    <button type="button" @click="mobileMenuOpen = false; $dispatch('open-report-modal')" class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs font-medium text-text/70 transition-colors hover:bg-gray-100 dark:hover:bg-neutral-800">
+                        <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg>
+                        {{ __('Report an issue') }}
+                    </button>
+
+                    <div class="my-1 border-t border-gray-100 dark:border-neutral-800"></div>
+
+                    <form method="POST" action="{{ route('logout') }}" class="w-full">
+                        @csrf
+                        <button type="submit" class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs font-medium text-red-500 transition-colors hover:bg-red-50 dark:hover:bg-red-900/10">
+                            <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9"/></svg>
+                            {{ __('Log out') }}
+                        </button>
+                    </form>
+                </div>
             </div>
         </flux:header>
 
@@ -192,13 +231,13 @@
         </div>
 
         {{-- Mobile Sidebar --}}
-        <flux:sidebar collapsible="mobile" class="lg:hidden bg-white dark:bg-neutral-900">
+        <flux:sidebar collapsible="mobile" class="lg:hidden max-h-screen overflow-y-auto bg-white dark:bg-neutral-900">
             <flux:sidebar.header>
                 <x-app-logo :sidebar="true" href="{{ route('dashboard') }}" wire:navigate />
                 <flux:sidebar.collapse />
             </flux:sidebar.header>
 
-            <flux:sidebar.nav class="space-y-1">
+            <flux:sidebar.nav class="space-y-1 overflow-y-auto pb-2">
                 <flux:sidebar.group>
                     <flux:sidebar.item icon="home" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate>
                         {{ __('Home') }}

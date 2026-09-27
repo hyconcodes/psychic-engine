@@ -314,7 +314,7 @@
         </div>
 
         {{-- Report an Issue --}}
-        <div class="text-center pt-2 pb-1" x-data="{ reportOpen: false, initReportModal() { setTimeout(() => { this.reportOpen = true; }, 100) }}" @open-report-modal.window="reportOpen = true" x-init="initReportModal()">
+        <div class="text-center pt-2 pb-1" x-data="{ reportOpen: false }" @open-report-modal.window="reportOpen = true">
             <button type="button" @click="reportOpen = true" class="text-[11px] text-text/30 hover:text-primary transition-colors cursor-pointer">
                 {{ __('Report an issue') }}
             </button>
@@ -391,48 +391,6 @@
                         </form>
                     </div>
                 </div>
-            </div>
-        </div>
-
-        {{-- Avatar Theme Toggle --}}
-        <div class="fixed bottom-20 right-4 sm:bottom-6 sm:right-6 z-40" x-data="{ themeOpen: false }">
-            <button type="button" @click="themeOpen = !themeOpen"
-                class="w-11 h-11 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center text-white text-sm font-bold shadow-lg shadow-primary/30 ring-2 ring-white dark:ring-neutral-900 cursor-pointer hover:scale-105 transition-transform">
-                {{ $user->initials() }}
-            </button>
-            <div x-show="themeOpen" x-cloak
-                x-transition:enter="ease-out duration-150"
-                x-transition:enter-start="opacity-0 scale-90 translate-y-2"
-                x-transition:enter-end="opacity-100 scale-100 translate-y-0"
-                x-transition:leave="ease-in duration-100"
-                x-transition:leave-start="opacity-100 scale-100"
-                x-transition:leave-end="opacity-0 scale-90"
-                @click.outside="themeOpen = false"
-                class="absolute bottom-14 right-0 w-44 bg-white dark:bg-neutral-900 rounded-xl border border-gray-100 dark:border-neutral-800 shadow-xl p-1.5">
-                <button type="button" @click="$flux.appearance = 'light'; themeOpen = false"
-                    class="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition-colors cursor-pointer"
-                    :class="$flux.appearance === 'light' || ($flux.appearance === 'system' && !window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'bg-primary/10 text-primary' : 'text-text/60 hover:bg-gray-100 dark:hover:bg-neutral-800'">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z"/></svg>
-                    {{ __('Light') }}
-                </button>
-                <button type="button" @click="$flux.appearance = 'dark'; themeOpen = false"
-                    class="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition-colors cursor-pointer"
-                    :class="$flux.appearance === 'dark' || ($flux.appearance === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'bg-primary/10 text-primary' : 'text-text/60 hover:bg-gray-100 dark:hover:bg-neutral-800'">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z"/></svg>
-                    {{ __('Dark') }}
-                </button>
-                <button type="button" @click="$flux.appearance = 'system'; themeOpen = false"
-                    class="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition-colors cursor-pointer"
-                    :class="$flux.appearance === 'system' ? 'bg-primary/10 text-primary' : 'text-text/60 hover:bg-gray-100 dark:hover:bg-neutral-800'">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17.25v1.007a3 3 0 01-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0115 18.257V17.25m6-12V15a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 15V5.25m18 0A2.25 2.25 0 0018.75 3H5.25A2.25 2.25 0 003 5.25m18 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 7.41A2.25 2.25 0 012.25 5.496V5.25"/></svg>
-                    {{ __('System') }}
-                </button>
-                <div class="border-t border-gray-100 dark:border-neutral-800 my-1"></div>
-                <button type="button" @click="themeOpen = false; $dispatch('open-report-modal')"
-                    class="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium text-text/60 hover:bg-gray-100 dark:hover:bg-neutral-800 transition-colors cursor-pointer">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg>
-                    {{ __('Report an issue') }}
-                </button>
             </div>
         </div>
     </div>

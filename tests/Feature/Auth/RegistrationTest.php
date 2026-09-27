@@ -35,6 +35,40 @@ test('new users can register', function () {
     ]);
 });
 
+test('registration rejects passwords shorter than six characters', function () {
+    $response = $this->from(route('register'))->post(route('register.store'), [
+        'name' => 'John Doe',
+        'username' => 'johndoe',
+        'email' => 'test@example.com',
+        'password' => 'abcde',
+        'password_confirmation' => 'abcde',
+    ]);
+
+    $response->assertRedirect(route('register'))
+        ->assertSessionHasErrors('password');
+
+    $this->assertDatabaseMissing('users', ['email' => 'test@example.com']);
+});
+
+test('registration accepts six-character passwords', function () {
+    $response = $this->post(route('register.store'), [
+        'name' => 'John Doe',
+        'username' => 'johndoe',
+        'email' => 'test@example.com',
+        'password' => 'abcdef',
+        'password_confirmation' => 'abcdef',
+    ]);
+
+    $response->assertSessionHasNoErrors()
+        ->assertRedirect(route('dashboard', absolute: false));
+
+    $this->assertAuthenticated();
+    $this->assertDatabaseHas('users', [
+        'username' => 'johndoe',
+        'email' => 'test@example.com',
+    ]);
+});
+
 test('registration rejects usernames longer than eight characters', function () {
     $response = $this->from(route('register'))->post(route('register.store'), [
         'name' => 'John Doe',
